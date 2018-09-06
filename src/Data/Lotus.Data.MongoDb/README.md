@@ -22,7 +22,7 @@ public class Product : IdentityEntity
 }
 ```
 
-Notice: The class must inherit class "IdentityEntity".
+**Notice: The domain class must inherit class "IdentityEntity".**
 
 ## The CRUD Operations Calling Example
 
@@ -144,6 +144,75 @@ public void TestUpdateMany()
 
         result = db.SaveChange();
         Assert.True(result.Success && result.Value == findProducts.Count());
+    }
+}
+```
+
+## Delete Operation
+
+```csharp
+public void TestDeleteSingle()
+{
+    using (var db = new MongoDbContext(_option))
+    {
+        db.Add(new Product()
+        {
+            MongoId = 5324941893933151371,
+            ProductName = "Surface",
+            Price = 12.5m,
+            CreateTime = DateTime.Now
+        });
+
+        var result = db.SaveChange();
+        Assert.True(result.Success && result.Value == 1);
+
+        var findProduct = db.Find<Product>(x => x.MongoId == 5324941893933151371).FirstOrDefault();
+        Assert.NotNull(findProduct);
+
+        db.Remove(findProduct);
+
+        result = db.SaveChange();
+        Assert.True(result.Success && result.Value == 1);
+    }
+}
+```
+
+```csharp
+public void TestDeleteMany()
+{
+    using (var db = new MongoDbContext(_option))
+    {
+        var findProducts = db.Find<Product>(x => x.MongoId >= 0 && x.MongoId < 20);
+        Assert.True(findProducts != null && findProducts.Count() > 0);
+
+        db.RemoveRange(findProducts);
+
+        var result = db.SaveChange();
+        Assert.True(result.Success && result.Value == findProducts.Count());
+    }
+}
+```
+
+## Query Operation
+
+```csharp
+public void TestFind()
+{
+    using (var db = new MongoDbContext(_option))
+    {
+        var products = db.Find<Product>(x => x.Price > 0).ToList();
+        Assert.True(products != null && products.Count > 0);
+    }
+}
+```
+
+```csharp
+public void TestQueryable()
+{
+    using (var db = new MongoDbContext(_option))
+    {
+        var products = db.AsQueryable<Product>().Where(x => x.Price > 0).ToList();
+        Assert.True(products != null && products.Count > 0);
     }
 }
 ```

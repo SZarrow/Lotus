@@ -70,6 +70,16 @@ namespace Lotus.Data.MongoDb.Tests
         }
 
         [Fact]
+        public void TestQueryable()
+        {
+            using (var db = new MongoDbContext(_option))
+            {
+                var products = db.AsQueryable<Product>().Where(x => x.Price > 0).ToList();
+                Assert.True(products != null && products.Count > 0);
+            }
+        }
+
+        [Fact]
         public void TestDeleteSingle()
         {
             using (var db = new MongoDbContext(_option))
