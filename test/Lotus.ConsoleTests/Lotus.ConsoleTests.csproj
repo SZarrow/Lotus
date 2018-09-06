@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MQ\Lotus.MQCore\Lotus.MQCore.csproj" />
+    <ProjectReference Include="..\..\src\MQ\Lotus.RocketMQ\Lotus.MQProvider.RocketMQ.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Aliyun.RocketMQ">
+      <HintPath>..\..\src\MQ\Lotus.RocketMQ\lib\Aliyun.RocketMQ.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

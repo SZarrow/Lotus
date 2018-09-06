@@ -1,0 +1,12 @@
+{
+    "TEST": "True",
+    "ONSUrl": "xxxxxxxxx",
+    "ONSPub": {
+        "AccessKeyId": "xxxxxxxx",
+        "AccessKeySecret": "xxxxxxxx"
+    },
+    "ONSSub": {
+        "AccessKeyId": "xxxxxxxx",
+        "AccessKeySecret": "xxxxxxxx"
+    }
+}
