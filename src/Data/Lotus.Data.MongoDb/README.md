@@ -36,7 +36,7 @@ private MongoDbOption _option = new MongoDbOption()
 };
 ```
 
-### Create Operation
+## Create Operation
 
 ```csharp
 public void TestAddSingle()
@@ -84,3 +84,66 @@ public void TestAddRange()
 }
 ```
 
+## Update Operation
+
+```csharp
+public void TestUpdateSingle()
+{
+    using (var db = new MongoDbContext(_option))
+    {
+        db.Add(new Product()
+        {
+            MongoId = 9001,
+            Price = 12.5m,
+            CreateTime = DateTime.Now,
+            ProductName = "Surface1713"
+        });
+
+        var result = db.SaveChange();
+
+        var findProduct = db.Find<Product>(x => x.MongoId == 9001).FirstOrDefault();
+        Assert.NotNull(findProduct);
+
+        findProduct.ProductName = $"Updated-Surface-{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}";
+        db.Update(findProduct);
+
+        result = db.SaveChange();
+        Assert.True(result.Success && result.Value == 1);
+    }
+}
+```
+
+```csharp
+public void TestUpdateMany()
+{
+    using (var db = new MongoDbContext(_option))
+    {
+        for (var i = 1; i <= 3; i++)
+        {
+            db.Add(new Product()
+            {
+                MongoId = 1000 + i,
+                Price = 12.5m,
+                ProductName = "Surface100" + i.ToString(),
+                CreateTime = DateTime.Now
+            });
+        }
+
+        var result = db.SaveChange();
+
+        var findProducts = db.Find<Product>(x => x.MongoId > 1000 && x.MongoId < 1004);
+        Assert.True(findProducts != null && findProducts.Count() > 0);
+
+        foreach (var product in findProducts)
+        {
+            product.Price -= 10;
+            product.ProductName = "Updated-" + product.ProductName;
+        }
+
+        db.UpdateRange(findProducts);
+
+        result = db.SaveChange();
+        Assert.True(result.Success && result.Value == findProducts.Count());
+    }
+}
+```
