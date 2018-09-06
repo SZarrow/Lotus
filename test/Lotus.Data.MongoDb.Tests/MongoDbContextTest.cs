@@ -100,7 +100,7 @@ namespace Lotus.Data.MongoDb.Tests
         {
             using (var db = new MongoDbContext(_option))
             {
-                var findProducts = db.Find<Product>(x => x.MongoId >= 0);
+                var findProducts = db.Find<Product>(x => x.MongoId >= 0 && x.MongoId < 20);
                 Assert.True(findProducts != null && findProducts.Count() > 0);
 
                 db.RemoveRange(findProducts);
@@ -154,7 +154,7 @@ namespace Lotus.Data.MongoDb.Tests
 
                 var result = db.SaveChange();
 
-                var findProducts = db.Find<Product>(x => x.MongoId > 1000);
+                var findProducts = db.Find<Product>(x => x.MongoId > 1000 && x.MongoId < 1004);
                 Assert.True(findProducts != null && findProducts.Count() > 0);
 
                 foreach (var product in findProducts)
