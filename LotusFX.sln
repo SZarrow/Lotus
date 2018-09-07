@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Data", "src\Data\Lotu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Data.MongoDb.Tests", "test\Lotus.Data.MongoDb.Tests\Lotus.Data.MongoDb.Tests.csproj", "{AD8D38F6-5396-4830-B302-E71C71775470}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Security.Tests", "test\Lotus.Security.Tests\Lotus.Security.Tests.csproj", "{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Security.Tests", "test\Lotus.Security.Tests\Lotus.Security.Tests.csproj", "{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
