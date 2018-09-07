@@ -17,10 +17,4 @@
     <ProjectReference Include="..\..\src\Lotus.Security\Lotus.Security.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="DotNetWheels.Core">
-      <HintPath>..\..\..\..\Packages\DotNetWheels.Core\DotNetWheels.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
