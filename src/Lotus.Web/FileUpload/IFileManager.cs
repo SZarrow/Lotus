@@ -12,28 +12,28 @@ namespace Lotus.Web.FileUpload
     /// <summary>
     /// 
     /// </summary>
-    //public interface IFileManager
-    //{
-    //    /// <summary>
-    //    /// The event will be triggered after validated and before writing.
-    //    /// </summary>
-    //    event FileSavingDelegate FileSaving;
-    //    /// <summary>
-    //    /// The event will be triggered after writing.
-    //    /// </summary>
-    //    event FileSavedDelegate FileSaved;
-    //    /// <summary>
-    //    /// Add file to the upload queue list.
-    //    /// </summary>
-    //    /// <param name="file"></param>
-    //    void AddFile(UploadFileInfo file);
-    //    /// <summary>
-    //    /// Execute uploading.
-    //    /// </summary>
-    //    /// <param name="state"></param>
-    //    /// <returns></returns>
-    //    UploadResult Upload(Object state = null);
-    //}
+    public interface IFileManager
+    {
+        /// <summary>
+        /// The event will be triggered after validated and before writing.
+        /// </summary>
+        event FileSavingDelegate FileSaving;
+        /// <summary>
+        /// The event will be triggered after writing.
+        /// </summary>
+        event FileSavedDelegate FileSaved;
+        /// <summary>
+        /// Add file to the upload queue list.
+        /// </summary>
+        /// <param name="file"></param>
+        void AddFile(UploadFileInfo file);
+        /// <summary>
+        /// Execute uploading.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        UploadResult Upload(Object state = null);
+    }
 
 
     /// <summary>
