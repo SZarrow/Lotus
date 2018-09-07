@@ -23,7 +23,7 @@ namespace Lotus.Data.MongoDb.Tests
                 db.Add(new Product()
                 {
                     ProductName = "Surface",
-                    Price = 12.5m,
+                    Price = 12.56m,
                     CreateTime = DateTime.Now
                 });
 
