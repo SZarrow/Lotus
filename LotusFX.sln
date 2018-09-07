@@ -43,6 +43,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Data", "src\Data\Lotu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Data.MongoDb.Tests", "test\Lotus.Data.MongoDb.Tests\Lotus.Data.MongoDb.Tests.csproj", "{AD8D38F6-5396-4830-B302-E71C71775470}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Security.Tests", "test\Lotus.Security.Tests\Lotus.Security.Tests.csproj", "{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,10 @@ Global
 		{AD8D38F6-5396-4830-B302-E71C71775470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD8D38F6-5396-4830-B302-E71C71775470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD8D38F6-5396-4830-B302-E71C71775470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,6 +138,7 @@ Global
 		{E31B8552-0AB8-4D42-85A8-6A5EB2BC2F41} = {1322E4AC-BE41-4501-96D6-5BF14376810F}
 		{512B2780-1432-4FD1-929E-F0B31A5064DC} = {1322E4AC-BE41-4501-96D6-5BF14376810F}
 		{AD8D38F6-5396-4830-B302-E71C71775470} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
+		{1FDECAFD-54FF-4281-A3DB-1246D3B5B3D1} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75DFAC68-4D3A-46B6-8147-7B4FD62A3822}
