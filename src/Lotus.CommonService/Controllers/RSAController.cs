@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Lotus.CommonService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RSAController : ControllerBase
     {
