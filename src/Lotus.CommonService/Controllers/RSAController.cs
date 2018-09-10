@@ -17,8 +17,9 @@ namespace Lotus.CommonService.Controllers
         public ActionResult GenKeyPairs()
         {
             String id = Guid.NewGuid().ToString("n");
-            String cacheDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"cache");
-            if (!Directory.Exists(cacheDir)) {
+            String cacheDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
+            if (!Directory.Exists(cacheDir))
+            {
                 try
                 {
                     Directory.CreateDirectory(cacheDir);
@@ -28,11 +29,12 @@ namespace Lotus.CommonService.Controllers
                     return new JsonResult(ex);
                 }
             }
-            var savePath = Path.Combine(cacheDir,id+".pem");
-           var p = Process.Start("openssl", $"genrsa -out {savePath} 1024");
+            var savePath = Path.Combine(cacheDir, id + ".pem");
+            var p = Process.Start("openssl", $"genrsa -out {savePath} 1024");
             p.WaitForExit();
 
-            if (!System.IO.File.Exists(savePath)) {
+            if (!System.IO.File.Exists(savePath))
+            {
                 return new JsonResult(new { error = "" });
             }
 
