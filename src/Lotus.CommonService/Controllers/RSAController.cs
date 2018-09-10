@@ -52,7 +52,10 @@ namespace Lotus.CommonService.Controllers
             String privateKey = null;
             try
             {
-                privateKey = System.IO.File.ReadAllText(privateKeySavePath);
+                var lines = System.IO.File.ReadAllLines(privateKeySavePath);
+                lines[0] = String.Empty;
+                lines[lines.Length - 1] = String.Empty;
+                privateKey = String.Concat(lines);
             }
             catch (Exception ex)
             {
@@ -78,7 +81,10 @@ namespace Lotus.CommonService.Controllers
             String publicKey = null;
             try
             {
-                publicKey = System.IO.File.ReadAllText(publicKeySavePath);
+                var lines = System.IO.File.ReadAllLines(publicKeySavePath);
+                lines[0] = String.Empty;
+                lines[lines.Length - 1] = String.Empty;
+                publicKey = String.Concat(lines);
             }
             catch (Exception ex)
             {
