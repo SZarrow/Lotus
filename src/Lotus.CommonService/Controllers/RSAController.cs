@@ -17,6 +17,9 @@ namespace Lotus.CommonService.Controllers
         public ActionResult GenKeyPairs()
         {
             String id = Guid.NewGuid().ToString("n");
+            String privateKeyPemFileName = $"{id}_priv.pem";
+            String publicKeyPemFileName = $"{id}_pub.pem";
+
             String cacheDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
             if (!Directory.Exists(cacheDir))
             {
@@ -29,18 +32,74 @@ namespace Lotus.CommonService.Controllers
                     return new JsonResult(ex);
                 }
             }
-            var savePath = Path.Combine(cacheDir, id + ".pem");
-            var p = Process.Start("openssl", $"genrsa -out {savePath} 1024");
-            p.WaitForExit();
 
-            if (!System.IO.File.Exists(savePath))
+            String privateKeySavePath = Path.Combine(cacheDir, privateKeyPemFileName);
+            try
             {
-                return new JsonResult(new { error = "" });
+                var p = Process.Start("openssl", $"genrsa -out {privateKeySavePath} 1024");
+                p.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                return this.FormatJson(null, 10001, ex.Message);
             }
 
-            String privateKey = System.IO.File.ReadAllText(savePath);
+            if (!System.IO.File.Exists(privateKeySavePath))
+            {
+                return this.FormatJson(null, 10001, $"File '{privateKeySavePath}' not found.");
+            }
 
-            return new JsonResult(new { });
+            String privateKey = null;
+            try
+            {
+                privateKey = System.IO.File.ReadAllText(privateKeySavePath);
+            }
+            catch (Exception ex)
+            {
+                return this.FormatJson(null, 10002, ex.Message);
+            }
+
+            String publicKeySavePath = Path.Combine(cacheDir, publicKeyPemFileName);
+            try
+            {
+                var p = Process.Start("openssl", $"rsa -pubout -in {privateKeySavePath} -out {publicKeySavePath}");
+                p.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                return this.FormatJson(null, 10003, ex.Message);
+            }
+
+            if (!System.IO.File.Exists(publicKeySavePath))
+            {
+                return this.FormatJson(null, 10001, $"File '{publicKeySavePath}' not found.");
+            }
+
+            String publicKey = null;
+            try
+            {
+                publicKey = System.IO.File.ReadAllText(publicKeySavePath);
+            }
+            catch (Exception ex)
+            {
+                return this.FormatJson(null, 10002, ex.Message);
+            }
+
+            try
+            {
+                System.IO.File.Delete(privateKeySavePath);
+                System.IO.File.Delete(publicKeySavePath);
+
+                return this.FormatJson(new
+                {
+                    PrivateKey = privateKey,
+                    PublicKey = publicKey
+                });
+            }
+            catch (Exception ex)
+            {
+                return this.FormatJson(null, 10003, ex.Message);
+            }
         }
     }
 }
