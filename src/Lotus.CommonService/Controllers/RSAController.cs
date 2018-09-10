@@ -41,12 +41,12 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10001, ex.Message);
+                return this.FormatJson(null, privateKeySavePath + "|" + ex.Message);
             }
 
             if (!System.IO.File.Exists(privateKeySavePath))
             {
-                return this.FormatJson(null, 10001, $"File '{privateKeySavePath}' not found.");
+                return this.FormatJson(null, $"File '{privateKeySavePath}' not found.");
             }
 
             String privateKey = null;
@@ -59,7 +59,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10002, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
 
             String publicKeySavePath = Path.Combine(cacheDir, publicKeyPemFileName);
@@ -70,12 +70,12 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10003, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
 
             if (!System.IO.File.Exists(publicKeySavePath))
             {
-                return this.FormatJson(null, 10001, $"File '{publicKeySavePath}' not found.");
+                return this.FormatJson(null, $"File '{publicKeySavePath}' not found.");
             }
 
             String publicKey = null;
@@ -88,7 +88,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10002, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
 
             try
@@ -104,7 +104,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10003, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
         }
     }
