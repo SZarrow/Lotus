@@ -62,11 +62,24 @@ namespace Lotus.OssCore
         /// <param name="args">附加参数</param>
         XResult<XOssObject> GetObject(String bucketName, String objectKey, Object args = null);
         /// <summary>
-        /// 如果未指定searchDirectory将获取指定bucket下的所有对象，否则只获取searchDirectory目录下的对象。
+        /// 如果未指定searchDirectory将获取指定bucket下的所有对象，否则只获取searchDirectory目录下的对象，并返回对象的Stream。
         /// </summary>
         /// <param name="bucketName">要获取的对象所在的bucket的名称。</param>
         /// <param name="searchDirectory">要获取的对象所在的目录。注意：目录要从根目录开始，子目录间分隔符要使用"/"，必须以"/"结尾但不能以"/"开头。例如：可以指定这样的目录"images/2018/"。</param>
         /// <param name="args">附加参数</param>
         XResult<IEnumerable<XOssObject>> GetObjects(String bucketName, String searchDirectory = null, Object args = null);
+        /// <summary>
+        /// 如果未指定searchDirectory将获取指定bucket下的所有对象，否则只获取searchDirectory目录下的对象，但不返回对象的Stream。
+        /// </summary>
+        /// <param name="bucketName">要获取的对象所在的bucket的名称。</param>
+        /// <param name="searchDirectory">要获取的对象所在的目录。注意：目录要从根目录开始，子目录间分隔符要使用"/"，必须以"/"结尾但不能以"/"开头。例如：可以指定这样的目录"images/2018/"。</param>
+        /// <param name="args">附加参数</param>
+        XResult<IEnumerable<XOssObject>> ListObjects(String bucketName, String searchDirectory = null);
+        /// <summary>
+        /// 判断指定对象是否存在。
+        /// </summary>
+        /// <param name="bucketName">要获取的对象所在的bucket的名称。</param>
+        /// <param name="objectKey">要获取的对象的路径。</param>
+        XResult<Boolean> Exists(String bucketName, String objectKey);
     }
 }

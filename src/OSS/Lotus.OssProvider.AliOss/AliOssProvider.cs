@@ -360,5 +360,83 @@ namespace Lotus.OssProvider.AliOss
                 return new XResult<IEnumerable<XOssObject>>(null, ex);
             }
         }
+
+        public XResult<IEnumerable<XOssObject>> ListObjects(String bucketName, String searchDirectory = null)
+        {
+            if (String.IsNullOrWhiteSpace(bucketName))
+            {
+                return new XResult<IEnumerable<XOssObject>>(null, new ArgumentNullException("bucketName"));
+            }
+
+            if (!String.IsNullOrWhiteSpace(searchDirectory))
+            {
+                if (searchDirectory.StartsWith("/"))
+                {
+                    searchDirectory = searchDirectory.TrimStart('/');
+                }
+
+                if (!searchDirectory.EndsWith("/"))
+                {
+                    searchDirectory += "/";
+                }
+            }
+
+            var listObjectsRequest = new ListObjectsRequest(bucketName);
+
+            if (!String.IsNullOrWhiteSpace(searchDirectory))
+            {
+                listObjectsRequest.Prefix = searchDirectory;
+                listObjectsRequest.Delimiter = "/";
+            }
+
+            ObjectListing objectListing = null;
+            try
+            {
+                objectListing = _client.ListObjects(listObjectsRequest);
+            }
+            catch (Exception ex)
+            {
+                return new XResult<IEnumerable<XOssObject>>(null, ex);
+            }
+
+            var summaries = objectListing.ObjectSummaries;
+            if (summaries == null)
+            {
+                return new XResult<IEnumerable<XOssObject>>(null);
+            }
+
+            var objects = new List<XOssObject>(summaries.Count());
+            foreach (var summary in summaries)
+            {
+                objects.Add(new XOssObject(summary.BucketName, summary.Key));
+            }
+
+            return new XResult<IEnumerable<XOssObject>>(objects);
+        }
+
+        public XResult<Boolean> Exists(String bucketName, String objectKey)
+        {
+            if (String.IsNullOrWhiteSpace(bucketName))
+            {
+                return new XResult<Boolean>(false, new ArgumentNullException("bucketName"));
+            }
+
+            if (String.IsNullOrWhiteSpace(objectKey))
+            {
+                return new XResult<Boolean>(false, new ArgumentNullException("objectKey"));
+            }
+
+            AliOssUtil.EnsureObjectKey(ref objectKey);
+
+            try
+            {
+                var value = _client.DoesObjectExist(bucketName, objectKey);
+                return new XResult<Boolean>(value);
+            }
+            catch (Exception ex)
+            {
+                return new XResult<Boolean>(false, ex);
+            }
+        }
     }
 }
