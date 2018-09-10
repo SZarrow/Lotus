@@ -7,14 +7,14 @@ namespace Microsoft.AspNetCore.Mvc
 {
     public static class ControllerBaseExtension
     {
-        public static JsonResult FormatJson(this ControllerBase controller, Object value, Int32 errCode, String errMsg)
+        public static JsonResult FormatJson(this ControllerBase controller, Object value, String errMsg)
         {
-            return new JsonResult(new { ErrCode = errCode, ErrMsg = errMsg, Value = value });
+            return new JsonResult(new { Status = "FAILURE", ErrMsg = errMsg, Value = value });
         }
 
         public static JsonResult FormatJson(this ControllerBase controller, Object value)
         {
-            return new JsonResult(new { ErrCode = 0, Value = value });
+            return new JsonResult(new { Status = "SUCCESS", Value = value });
         }
     }
 }
