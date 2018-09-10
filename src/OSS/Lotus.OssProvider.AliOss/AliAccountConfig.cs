@@ -39,7 +39,7 @@ namespace Lotus.OssProvider.AliOss
             var config = configBuilder.AddJsonFile(configFile).Build();
             if (config["TEST"] == "True")
             {
-                configFile = @"E:\Configs\AliOssAccount.json";
+                configFile = @"D:\Configs\AliOssAccount.json";
                 if (!File.Exists(configFile))
                 {
                     throw new FileNotFoundException(configFile);
