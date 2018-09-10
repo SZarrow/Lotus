@@ -266,5 +266,36 @@ namespace Lotus.OssProvider.AliOss.Tests
             Trace.WriteLine("GetAccessUrl: " + testChineseFileName.Value);
         }
 
+        [Fact]
+        public void TestListObjects()
+        {
+            IOssProvider provider = new AliOssProvider();
+
+            String dir = "images/2018/";
+            var result = provider.ListObjects("sh-oss-1", dir);
+
+            Assert.True(result.Success);
+
+            String info = String.Join(", ", (from t0 in result.Value
+                                             select t0.ObjectKey));
+            Trace.WriteLine($"获取目录下的所有文件：{info}");
+        }
+
+        [Fact]
+        public void TestExists()
+        {
+            IOssProvider provider = new AliOssProvider();
+
+            String key = "images/2018/20180910132805-1.jpg";
+            var result = provider.Exists("sh-oss-1", key);
+
+            Assert.False(result.Success);
+
+            key = "images/2018/20180910132805.jpg";
+            result = provider.Exists("sh-oss-1", key);
+
+            Assert.True(result.Success);
+        }
+
     }
 }
