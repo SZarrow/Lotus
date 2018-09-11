@@ -5,8 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Lotus.Net\Lotus.Net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="DotNetWheels.Core">
-      <HintPath>..\..\..\..\..\Packages\DotNetWheels.Core\DotNetWheels.Core.dll</HintPath>
+      <HintPath>D:\Packages\DotNetWheels.Core\DotNetWheels.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
