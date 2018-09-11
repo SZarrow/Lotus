@@ -51,8 +51,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Web.Mvc", "src\Lotus.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Payment", "Payment", "{40354126-45F7-4340-8E00-6D1A6C9345B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Payment.99bill", "src\Payment\Lotus.Payment.99bill\Lotus.Payment.99bill.csproj", "{1DAA4BD7-87AE-42B4-9249-0DB3319BB1C6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,10 +129,6 @@ Global
 		{6BFCD1C9-5094-4E1F-9E84-E91A21E891C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BFCD1C9-5094-4E1F-9E84-E91A21E891C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BFCD1C9-5094-4E1F-9E84-E91A21E891C8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DAA4BD7-87AE-42B4-9249-0DB3319BB1C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DAA4BD7-87AE-42B4-9249-0DB3319BB1C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DAA4BD7-87AE-42B4-9249-0DB3319BB1C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DAA4BD7-87AE-42B4-9249-0DB3319BB1C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,7 +156,6 @@ Global
 		{354D8721-5C08-449E-B80E-97896332267E} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
 		{6BFCD1C9-5094-4E1F-9E84-E91A21E891C8} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
 		{40354126-45F7-4340-8E00-6D1A6C9345B3} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
-		{1DAA4BD7-87AE-42B4-9249-0DB3319BB1C6} = {40354126-45F7-4340-8E00-6D1A6C9345B3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75DFAC68-4D3A-46B6-8147-7B4FD62A3822}
