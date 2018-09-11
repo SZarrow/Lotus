@@ -7,9 +7,10 @@ namespace Lotus.Payment.Bill99.Tests
     public class AgreementPaymentApiTest
     {
         [Fact]
-        public void TestAgreementApply()
+        public async void TestAgreementApply()
         {
-            AgreementPaymentApi.AgreementApply(new AgreementApplyRequest()
+            var api = new AgreementPaymentApi("aaa", "bbb");
+            await api.AgreementApply(new AgreementApplyRequest()
             {
 
             });

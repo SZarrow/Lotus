@@ -6,18 +6,21 @@ using System.Xml.Linq;
 
 namespace Lotus.Payment.Bill99.Domain
 {
-    public abstract class XmlSerializer<T>
+    public class XmlSerializer
     {
         private readonly XDocument _doc;
 
-        protected XmlSerializer()
+        public XmlSerializer()
         {
             _doc = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"));
         }
 
-        public String ToXml()
+        public String ToXml(Action<XDocument> buildDocument = null)
         {
-            BuildDocument(_doc);
+            if (buildDocument != null)
+            {
+                buildDocument(_doc);
+            }
 
             using (var ms = new MemoryStream())
             {
@@ -26,14 +29,12 @@ namespace Lotus.Payment.Bill99.Domain
             }
         }
 
-        public T FromXml(String xml)
+        public T FromXml<T>(String xml)
         {
             throw new NotImplementedException();
         }
 
-        public abstract void BuildDocument(XDocument doc);
-
-        protected String GetCamelName(String name)
+        public String GetCamelName(String name)
         {
             if (String.IsNullOrWhiteSpace(name))
             {

@@ -7,31 +7,32 @@ using DotNetWheels.Core;
 
 namespace Lotus.Payment.Bill99.Domain
 {
-    public class AgreementApplyRequest : XmlSerializer<AgreementApplyRequest>
+    [Serializable]
+    public class AgreementApplyRequest
     {
-        private const String NS = "http://www.99bill.com/mas_cnp_merchant_interface";
-
-        public String MerchantId { get; set; }
-        public String TerminalId { get; set; }
+        /// <summary>
+        /// 请求的Url
+        /// </summary>
+        public String RequestUrl { get; set; }
+        /// <summary>
+        /// 客户Id
+        /// </summary>
         public String CustomerId { get; set; }
+        /// <summary>
+        /// 外部跟踪编号
+        /// </summary>
         public String ExternalRefNumber { get; set; }
+        /// <summary>
+        /// 银行卡号
+        /// </summary>
         public String Pan { get; set; }
+        /// <summary>
+        /// 手机号码
+        /// </summary>
         public String PhoneNO { get; set; }
+        /// <summary>
+        /// 接入方式，0表示商户绑定
+        /// </summary>
         public String BindType { get; set; }
-
-        public override void BuildDocument(XDocument doc)
-        {
-            doc.Add(new XElement(XName.Get("MasMessage", NS)));
-            doc.Root.Add(new XElement(XName.Get("version", NS), "1.0"));
-            var contentEl = new XElement(XName.Get("indAuthContent", NS));
-
-            var properties = typeof(AgreementApplyRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var prop in properties)
-            {
-                contentEl.Add(new XElement(XName.Get(GetCamelName(prop.Name), NS), prop.XGetValue(this)));
-            }
-
-            doc.Root.Add(contentEl);
-        }
     }
 }
