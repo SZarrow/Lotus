@@ -41,22 +41,25 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10001, ex.Message);
+                return this.FormatJson(null, privateKeySavePath + "|" + ex.Message);
             }
 
             if (!System.IO.File.Exists(privateKeySavePath))
             {
-                return this.FormatJson(null, 10001, $"File '{privateKeySavePath}' not found.");
+                return this.FormatJson(null, $"File '{privateKeySavePath}' not found.");
             }
 
             String privateKey = null;
             try
             {
-                privateKey = System.IO.File.ReadAllText(privateKeySavePath);
+                var lines = System.IO.File.ReadAllLines(privateKeySavePath);
+                lines[0] = String.Empty;
+                lines[lines.Length - 1] = String.Empty;
+                privateKey = String.Concat(lines);
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10002, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
 
             String publicKeySavePath = Path.Combine(cacheDir, publicKeyPemFileName);
@@ -67,22 +70,25 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10003, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
 
             if (!System.IO.File.Exists(publicKeySavePath))
             {
-                return this.FormatJson(null, 10001, $"File '{publicKeySavePath}' not found.");
+                return this.FormatJson(null, $"File '{publicKeySavePath}' not found.");
             }
 
             String publicKey = null;
             try
             {
-                publicKey = System.IO.File.ReadAllText(publicKeySavePath);
+                var lines = System.IO.File.ReadAllLines(publicKeySavePath);
+                lines[0] = String.Empty;
+                lines[lines.Length - 1] = String.Empty;
+                publicKey = String.Concat(lines);
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10002, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
 
             try
@@ -98,7 +104,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, 10003, ex.Message);
+                return this.FormatJson(null, ex.Message);
             }
         }
     }
