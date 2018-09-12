@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Lotus.Net\Lotus.Net.csproj" />
+    <ProjectReference Include="..\..\Lotus.Serialization\Lotus.Serialization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

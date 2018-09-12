@@ -13,9 +13,9 @@ namespace Lotus.Payment.Bill99.Tests
         public void TestAgreementApply()
         {
             var api = new AgreementPaymentApi(new System.Net.Http.HttpClient(), "aaa", "bbb");
-            var result = api.AgreementApply(new AgreementApplyRequest()
+            var result = api.AgreementApply("http://api.suziyun.com/api/rsa/genkeys", new AgreementApplyRequest()
             {
-
+                 
             });
             Assert.True(result.Success);
         }
