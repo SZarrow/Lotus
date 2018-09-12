@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,11 +16,17 @@ namespace Lotus.Payment.Bill99
     /// </summary>
     public class AgreementPaymentApi
     {
+        private readonly HttpX _httpX;
         private readonly XmlSerializer _serializer;
         private const String NS = "http://www.99bill.com/mas_cnp_merchant_interface";
 
-        public AgreementPaymentApi(String merchantId, String terminalId)
+        public AgreementPaymentApi(HttpClient client, String merchantId, String terminalId)
         {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+
             if (String.IsNullOrWhiteSpace(merchantId))
             {
                 throw new ArgumentNullException(nameof(merchantId));
@@ -33,6 +40,7 @@ namespace Lotus.Payment.Bill99
             this.MerchantId = merchantId;
             this.TerminalId = terminalId;
 
+            _httpX = new HttpX(client);
             _serializer = new XmlSerializer();
         }
 
@@ -42,7 +50,7 @@ namespace Lotus.Payment.Bill99
         /// <summary>
         /// 签约申请
         /// </summary>
-        public async Task<XResult<AgreementApplyResult>> AgreementApply(AgreementApplyRequest request)
+        public XResult<AgreementApplyResult> AgreementApply(String requestUrl, AgreementApplyRequest request)
         {
             String xml = _serializer.ToXml(doc =>
             {
@@ -62,11 +70,30 @@ namespace Lotus.Payment.Bill99
                 doc.Root.Add(contentEl);
             });
 
-            HttpX httpX = new HttpX(null);
+            XResult<AgreementApplyResult> result = null;
 
-            var result = await httpX.PostXmlAsync<AgreementApplyResult>(request.RequestUrl, xml);
+            var task = _httpX.PostXmlAsync<AgreementApplyResult>(requestUrl, xml).ContinueWith(t0 =>
+            {
+                if (t0.IsCompleted)
+                {
+                    if (t0.IsCanceled || t0.IsFaulted)
+                    {
+                        throw new TaskCanceledException();
+                    }
 
-            return new XResult<AgreementApplyResult>(null);
+                    result = t0.Result;
+                }
+            });
+
+            try
+            {
+                task.Wait();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new XResult<AgreementApplyResult>(null, ex);
+            }
         }
     }
 }

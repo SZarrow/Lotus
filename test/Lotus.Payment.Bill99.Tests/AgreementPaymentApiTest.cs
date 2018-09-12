@@ -1,4 +1,7 @@
-using System;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
 using Lotus.Payment.Bill99.Domain;
 using Xunit;
 
@@ -7,13 +10,14 @@ namespace Lotus.Payment.Bill99.Tests
     public class AgreementPaymentApiTest
     {
         [Fact]
-        public async void TestAgreementApply()
+        public void TestAgreementApply()
         {
-            var api = new AgreementPaymentApi("aaa", "bbb");
-            await api.AgreementApply(new AgreementApplyRequest()
+            var api = new AgreementPaymentApi(new System.Net.Http.HttpClient(), "aaa", "bbb");
+            var result = api.AgreementApply(new AgreementApplyRequest()
             {
 
             });
+            Assert.True(result.Success);
         }
     }
 }
