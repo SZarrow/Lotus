@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using DotNetWheels.Core;
+using Lotus.Core;
 using Lotus.Net.Http;
 using Lotus.Payment.Bill99.Domain;
+using Lotus.Serialization;
 
 namespace Lotus.Payment.Bill99
 {
@@ -50,29 +51,13 @@ namespace Lotus.Payment.Bill99
         /// <summary>
         /// 签约申请
         /// </summary>
-        public XResult<AgreementApplyResult> AgreementApply(String requestUrl, AgreementApplyRequest request)
+        public XResult<AgreementApplyResponse> AgreementApply(String requestUrl, AgreementApplyRequest request)
         {
-            String xml = _serializer.ToXml(doc =>
-            {
-                doc.Add(new XElement(XName.Get("MasMessage", NS)));
-                doc.Root.Add(new XElement(XName.Get("version", NS), "1.0"));
-                var contentEl = new XElement(XName.Get("indAuthContent", NS));
+            String xml = _serializer.Serialize(request);
 
-                contentEl.Add(new XElement(XName.Get(_serializer.GetCamelName("MerchantId"), NS), this.MerchantId));
-                contentEl.Add(new XElement(XName.Get(_serializer.GetCamelName("TerminalId"), NS), this.TerminalId));
+            XResult<AgreementApplyResponse> result = null;
 
-                var properties = typeof(AgreementApplyRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                foreach (var prop in properties)
-                {
-                    contentEl.Add(new XElement(XName.Get(_serializer.GetCamelName(prop.Name), NS), prop.XGetValue(request)));
-                }
-
-                doc.Root.Add(contentEl);
-            });
-
-            XResult<AgreementApplyResult> result = null;
-
-            var task = _httpX.PostXmlAsync<AgreementApplyResult>(requestUrl, xml).ContinueWith(t0 =>
+            var task = _httpX.PostXmlAsync<AgreementApplyResponse>(requestUrl, xml).ContinueWith(t0 =>
             {
                 if (t0.IsCompleted)
                 {
@@ -92,7 +77,7 @@ namespace Lotus.Payment.Bill99
             }
             catch (Exception ex)
             {
-                return new XResult<AgreementApplyResult>(null, ex);
+                return new XResult<AgreementApplyResponse>(null, ex);
             }
         }
     }

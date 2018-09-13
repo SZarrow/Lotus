@@ -19,11 +19,11 @@ namespace Lotus.Serialization
 
             if (!String.IsNullOrWhiteSpace(namespaceName))
             {
-                this.Namespace = XNamespace.Get(namespaceName);
+                this.Namespace = namespaceName;
             }
         }
 
         public String ElementName { get; }
-        public XNamespace Namespace { get; }
+        public String Namespace { get; }
     }
 }
