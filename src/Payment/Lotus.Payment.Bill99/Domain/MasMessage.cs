@@ -6,8 +6,10 @@ using Lotus.Serialization;
 namespace Lotus.Payment.Bill99.Domain
 {
     [XElement("MasMessage", "http://www.99bill.com/mas_cnp_merchant_interface")]
-    public abstract class MasMessageRequest
+    public abstract class MasMessage
     {
+        protected MasMessage() { }
+
         [XElement("version")]
         public String Version { get; set; }
     }

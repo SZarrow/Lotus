@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace Lotus.Payment.Bill99.Domain
 {
-    public class AgreementApplyResult
+    public class AgreementApplyResponse : MasMessage
     {
         public String MerchantId { get; set; }
         public String TerminalId { get; set; }
@@ -14,7 +14,7 @@ namespace Lotus.Payment.Bill99.Domain
         public String StorablePan { get; set; }
         public String Paytoken { get; set; }
         public String Token { get; set; }
-        public String ResponseCode { get; set;}
+        public String ResponseCode { get; set; }
         public String ResponseTextMessage { get; set; }
     }
 }

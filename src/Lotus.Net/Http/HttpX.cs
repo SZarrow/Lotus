@@ -5,8 +5,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
-using DotNetWheels.Core;
+using Lotus.Core;
+using Lotus.Serialization;
 using Newtonsoft.Json;
 
 namespace Lotus.Net.Http
@@ -96,12 +96,11 @@ namespace Lotus.Net.Http
                 return new XResult<TResult>(default(TResult), respContent.Exceptions.ToArray());
             }
 
-            var respStream = await respContent.Value.ReadAsStreamAsync();
-            XmlSerializer serializer = new XmlSerializer(typeof(TResult));
+            var respString = await respContent.Value.ReadAsStringAsync();
+            XmlSerializer serializer = new XmlSerializer();
             try
             {
-                var result = serializer.Deserialize(respStream);
-                return new XResult<TResult>(result is TResult ? (TResult)result : default(TResult));
+                return serializer.Deserialize<TResult>(respString);
             }
             catch (Exception ex)
             {

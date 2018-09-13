@@ -9,7 +9,7 @@ namespace Lotus.Payment.Bill99.Domain
 {
     [Serializable]
     [XElement("indAuthContent")]
-    public class AgreementApplyRequest
+    public class AgreementApplyRequest : MasMessage
     {
         /// <summary>
         /// 客户Id
