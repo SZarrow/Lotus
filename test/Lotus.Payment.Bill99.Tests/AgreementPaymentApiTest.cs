@@ -19,7 +19,8 @@ namespace Lotus.Payment.Bill99.Tests
                 handler.ClientCertificates.Add(new X509Certificate2("~/10411004511201290.pfx", "vpos123"));
                 using (var client = new HttpClient(handler))
                 {
-                    client.DefaultRequestHeaders.Add("Authorization", $"Basic {}");
+                    String auth = "";
+                    client.DefaultRequestHeaders.Add("Authorization", $"Basic {auth}");
                     var api = new AgreementPaymentApi(client, "812310060510214", "13196988");
                     var result = api.AgreementApply("https://sandbox.99bill.com:9445/cnp/ind_auth", new AgreementApplyRequest()
                     {
