@@ -57,7 +57,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Payment.Bill99.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Net", "src\Lotus.Net\Lotus.Net.csproj", "{DE1D62F7-B847-44A1-A417-B193A3EFB23C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Serialization", "src\Lotus.Serialization\Lotus.Serialization.csproj", "{1E224B9B-4726-48C8-84A1-6D3DBA33198A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Serialization", "src\Lotus.Serialization\Lotus.Serialization.csproj", "{1E224B9B-4726-48C8-84A1-6D3DBA33198A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Serialization.Tests", "test\Lotus.Serialization.Tests\Lotus.Serialization.Tests.csproj", "{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{1E224B9B-4726-48C8-84A1-6D3DBA33198A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E224B9B-4726-48C8-84A1-6D3DBA33198A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E224B9B-4726-48C8-84A1-6D3DBA33198A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -184,6 +190,7 @@ Global
 		{E84C965D-868E-4140-9246-15241E500BDA} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
 		{DE1D62F7-B847-44A1-A417-B193A3EFB23C} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
 		{1E224B9B-4726-48C8-84A1-6D3DBA33198A} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
+		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75DFAC68-4D3A-46B6-8147-7B4FD62A3822}

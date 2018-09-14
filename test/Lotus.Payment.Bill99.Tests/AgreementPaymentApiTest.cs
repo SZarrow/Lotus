@@ -15,7 +15,12 @@ namespace Lotus.Payment.Bill99.Tests
             var api = new AgreementPaymentApi(new System.Net.Http.HttpClient(), "aaa", "bbb");
             var result = api.AgreementApply("http://api.suziyun.com/api/rsa/genkeys", new AgreementApplyRequest()
             {
-                 
+                BindType = "0",
+                CustomerId = "C0001",
+                ExternalRefNumber = "ERF0001",
+                Pan = "Pan0001",
+                PhoneNO = "12345678901",
+                Version = "1.0"
             });
             Assert.True(result.Success);
         }

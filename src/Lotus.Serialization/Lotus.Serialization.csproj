@@ -8,4 +8,10 @@
     <ProjectReference Include="..\Lotus.Core\Lotus.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DotNetWheels.Core">
+      <HintPath>..\..\..\..\Packages\DotNetWheels.Core\DotNetWheels.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
