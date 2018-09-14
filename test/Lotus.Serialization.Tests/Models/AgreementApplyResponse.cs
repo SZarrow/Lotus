@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 namespace Lotus.Serialization.Tests.Models
 {
     /// <summary>
-    /// 签约申请返回消息
+    /// 签约申请返回的消息
     /// </summary>
     public class AgreementApplyResponse : MasMessage
     {

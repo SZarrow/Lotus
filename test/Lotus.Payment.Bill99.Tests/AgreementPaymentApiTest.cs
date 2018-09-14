@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml.Serialization;
 using Lotus.Payment.Bill99.Domain;
@@ -12,17 +14,26 @@ namespace Lotus.Payment.Bill99.Tests
         [Fact]
         public void TestAgreementApply()
         {
-            var api = new AgreementPaymentApi(new System.Net.Http.HttpClient(), "aaa", "bbb");
-            var result = api.AgreementApply("http://api.suziyun.com/api/rsa/genkeys", new AgreementApplyRequest()
+            using (var handler = new HttpClientHandler())
             {
-                BindType = "0",
-                CustomerId = "C0001",
-                ExternalRefNumber = "ERF0001",
-                Pan = "Pan0001",
-                PhoneNO = "12345678901",
-                Version = "1.0"
-            });
-            Assert.True(result.Success);
+                handler.ClientCertificates.Add(new X509Certificate2("~/10411004511201290.pfx", "vpos123"));
+                using (var client = new HttpClient(handler))
+                {
+                    client.DefaultRequestHeaders.Add("Authorization", $"Basic {}");
+                    var api = new AgreementPaymentApi(client, "812310060510214", "13196988");
+                    var result = api.AgreementApply("https://sandbox.99bill.com:9445/cnp/ind_auth", new AgreementApplyRequest()
+                    {
+                        BindType = "0",
+                        CustomerId = "C0001",
+                        ExternalRefNumber = "ERF0001",
+                        Pan = "Pan0001",
+                        PhoneNO = "13382185203",
+                        Version = "1.0"
+                    });
+                    Assert.True(result.Success);
+                    Assert.NotNull(result.Value);
+                }
+            }
         }
     }
 }

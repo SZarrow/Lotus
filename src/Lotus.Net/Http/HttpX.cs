@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Lotus.Core;
@@ -90,6 +91,11 @@ namespace Lotus.Net.Http
             content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
             content.Headers.ContentEncoding.Add("UTF-8");
 
+            if (config != null)
+            {
+                config(_client);
+            }
+
             var respContent = await PostAsync(postUrl, content);
             if (!respContent.Success)
             {
@@ -97,10 +103,11 @@ namespace Lotus.Net.Http
             }
 
             var respString = await respContent.Value.ReadAsStringAsync();
-            XmlSerializer serializer = new XmlSerializer();
+            XSerializer serializer = new XSerializer();
             try
             {
-                return serializer.Deserialize<TResult>(respString);
+                var result = serializer.Deserialize<TResult>(respString);
+                return result != null ? new XResult<TResult>(result) : new XResult<TResult>(default(TResult), new NullReferenceException(nameof(result)));
             }
             catch (Exception ex)
             {
