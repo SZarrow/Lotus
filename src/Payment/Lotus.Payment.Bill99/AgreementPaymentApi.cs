@@ -18,7 +18,7 @@ namespace Lotus.Payment.Bill99
     public class AgreementPaymentApi
     {
         private readonly HttpX _httpX;
-        private readonly XmlSerializer _serializer;
+        private readonly XSerializer _serializer;
         private const String NS = "http://www.99bill.com/mas_cnp_merchant_interface";
 
         public AgreementPaymentApi(HttpClient client, String merchantId, String terminalId)
@@ -42,7 +42,7 @@ namespace Lotus.Payment.Bill99
             this.TerminalId = terminalId;
 
             _httpX = new HttpX(client);
-            _serializer = new XmlSerializer();
+            _serializer = new XSerializer();
         }
 
         public String MerchantId { get; }

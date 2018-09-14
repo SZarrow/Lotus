@@ -5,12 +5,11 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using LC = Lotus.Core;
 using DotNetWheels.Core;
 
 namespace Lotus.Serialization
 {
-    public class XmlSerializer
+    public class XSerializer
     {
         public String Serialize(Object value)
         {
@@ -47,6 +46,11 @@ namespace Lotus.Serialization
                     rootEl = parentEl;
                     break;
                 }
+            }
+
+            if (eleStack.Count == 1)
+            {
+                rootEl = eleStack.Pop();
             }
 
             doc.Add(rootEl);
@@ -121,11 +125,11 @@ namespace Lotus.Serialization
             }
         }
 
-        public LC.XResult<T> Deserialize<T>(String xml)
+        public T Deserialize<T>(String xml)
         {
             if (String.IsNullOrWhiteSpace(xml))
             {
-                return new LC.XResult<T>(default(T), new ArgumentNullException(nameof(xml)));
+                return default(T);
             }
 
             xml = RemoveUTF8MarkChar(xml);
@@ -135,14 +139,14 @@ namespace Lotus.Serialization
             {
                 doc = XDocument.Parse(xml, LoadOptions.None);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new LC.XResult<T>(default(T), ex);
+                return default(T);
             }
 
             if (doc == null)
             {
-                return new LC.XResult<T>(default(T), new NullReferenceException(nameof(doc)));
+                return default(T);
             }
 
             var targetType = typeof(T);
@@ -151,30 +155,13 @@ namespace Lotus.Serialization
             {
                 instance = Activator.CreateInstance<T>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new LC.XResult<T>(default(T), ex);
+                return default(T);
             }
 
             SetValue(targetType, instance, doc.Root);
-
-            //var eles = root.Elements();
-            //foreach (var el in eles)
-            //{
-            //    if (el.HasElements)
-            //    {
-            //        foreach (var elx in el.Elements())
-            //        {
-            //            SetValue(targetType, instance, elx);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        SetValue(targetType, instance, el);
-            //    }
-            //}
-
-            return new LC.XResult<T>(instance);
+            return instance;
         }
 
         private void SetValue<T>(Type targetType, T instance, XElement el)
@@ -183,6 +170,7 @@ namespace Lotus.Serialization
                                 let cusAttr = p.GetCustomAttribute<XElementAttribute>()
                                 where cusAttr != null && cusAttr.ElementName == el.Name.LocalName
                                 select p).FirstOrDefault();
+
             if (propertyInfo != null)
             {
                 var propertyValueResult = XConvert.TryParse(targetType, el.Value, null);
@@ -194,9 +182,9 @@ namespace Lotus.Serialization
 
             if (el.HasElements)
             {
-                foreach (var elx in el.Elements())
+                foreach (var childEl in el.Elements())
                 {
-                    SetValue(targetType, instance, elx);
+                    SetValue(targetType, instance, childEl);
                 }
             }
         }
