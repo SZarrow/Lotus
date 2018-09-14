@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -144,14 +145,7 @@ namespace Lotus.Serialization
                 return new LC.XResult<T>(default(T), new NullReferenceException(nameof(doc)));
             }
 
-            var root = doc.Root;
             var targetType = typeof(T);
-
-            if (String.Compare(root.Name.LocalName, targetType.Name, true) != 0)
-            {
-                return new LC.XResult<T>(default(T), new InvalidOperationException("the name of xml root isn't match name of target type"));
-            }
-
             T instance = default(T);
             try
             {
@@ -162,31 +156,49 @@ namespace Lotus.Serialization
                 return new LC.XResult<T>(default(T), ex);
             }
 
-            var eles = root.Elements();
-            foreach (var el in eles)
-            {
-                if (el.HasElements)
-                {
-                    foreach (var elx in el.Elements())
-                    {
+            SetValue(targetType, instance, doc.Root);
 
-                    }
-                }
-                else
+            //var eles = root.Elements();
+            //foreach (var el in eles)
+            //{
+            //    if (el.HasElements)
+            //    {
+            //        foreach (var elx in el.Elements())
+            //        {
+            //            SetValue(targetType, instance, elx);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        SetValue(targetType, instance, el);
+            //    }
+            //}
+
+            return new LC.XResult<T>(instance);
+        }
+
+        private void SetValue<T>(Type targetType, T instance, XElement el)
+        {
+            var propertyInfo = (from p in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
+                                let cusAttr = p.GetCustomAttribute<XElementAttribute>()
+                                where cusAttr != null && cusAttr.ElementName == el.Name.LocalName
+                                select p).FirstOrDefault();
+            if (propertyInfo != null)
+            {
+                var propertyValueResult = XConvert.TryParse(targetType, el.Value, null);
+                if (propertyValueResult.Success)
                 {
-                    var propertyInfo = targetType.GetProperty(el.Name.LocalName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
-                    if (propertyInfo != null)
-                    {
-                        var propertyValue = XConvert.TryParse(targetType, el.Value, null);
-                        if (propertyValue.Success)
-                        {
-                            propertyInfo.XSetValue(instance, propertyValue.Value);
-                        }
-                    }
+                    propertyInfo.XSetValue(instance, propertyValueResult.Value);
                 }
             }
 
-            throw new NotImplementedException();
+            if (el.HasElements)
+            {
+                foreach (var elx in el.Elements())
+                {
+                    SetValue(targetType, instance, elx);
+                }
+            }
         }
 
         /// <summary>
@@ -196,7 +208,7 @@ namespace Lotus.Serialization
         public static String RemoveUTF8MarkChar(String xml)
         {
             String byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-            if (xml.StartsWith(byteOrderMarkUtf8))
+            if (xml.StartsWith(byteOrderMarkUtf8) && xml[0] != '<')
             {
                 xml = xml.Remove(0, byteOrderMarkUtf8.Length);
             }
