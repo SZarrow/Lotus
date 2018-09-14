@@ -4,7 +4,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using Lotus.Core;
+using LC = Lotus.Core;
+using DotNetWheels.Core;
 
 namespace Lotus.Serialization
 {
@@ -29,7 +30,7 @@ namespace Lotus.Serialization
             while (typeStack.Count > 0)
             {
                 var type = typeStack.Pop();
-                BuildDocTree(eleStack, type);
+                BuildDocTree(value, eleStack, type);
             }
 
             XElement rootEl = null;
@@ -52,11 +53,12 @@ namespace Lotus.Serialization
             using (var ms = new MemoryStream())
             {
                 doc.Save(ms, SaveOptions.DisableFormatting | SaveOptions.OmitDuplicateNamespaces);
-                return Encoding.UTF8.GetString(ms.ToArray());
+                String result = Encoding.UTF8.GetString(ms.ToArray());
+                return RemoveUTF8MarkChar(result);
             }
         }
 
-        private void BuildDocTree(Stack<XElement> stack, Type instanceType)
+        private void BuildDocTree(Object value, Stack<XElement> stack, Type instanceType)
         {
             var insCusAttr = instanceType.GetCustomAttribute<XElementAttribute>(false);
             if (insCusAttr != null)
@@ -106,18 +108,26 @@ namespace Lotus.Serialization
                             }
                         }
 
+                        Object propertyValue = insProp.XGetValue(value);
+                        if (propertyValue != null)
+                        {
+                            insPropEl.Value = propertyValue.ToString();
+                        }
+
                         parentEl.Add(insPropEl);
                     }
                 }
             }
         }
 
-        public XResult<T> Deserialize<T>(String xml)
+        public LC.XResult<T> Deserialize<T>(String xml)
         {
             if (String.IsNullOrWhiteSpace(xml))
             {
-                return new XResult<T>(default(T), new ArgumentNullException(nameof(xml)));
+                return new LC.XResult<T>(default(T), new ArgumentNullException(nameof(xml)));
             }
+
+            xml = RemoveUTF8MarkChar(xml);
 
             XDocument doc = null;
             try
@@ -126,47 +136,72 @@ namespace Lotus.Serialization
             }
             catch (Exception ex)
             {
-                return new XResult<T>(default(T), ex);
+                return new LC.XResult<T>(default(T), ex);
             }
 
             if (doc == null)
             {
-                return new XResult<T>(default(T), new NullReferenceException(nameof(doc)));
+                return new LC.XResult<T>(default(T), new NullReferenceException(nameof(doc)));
             }
 
+            var root = doc.Root;
+            var targetType = typeof(T);
 
+            if (String.Compare(root.Name.LocalName, targetType.Name, true) != 0)
+            {
+                return new LC.XResult<T>(default(T), new InvalidOperationException("the name of xml root isn't match name of target type"));
+            }
+
+            T instance = default(T);
+            try
+            {
+                instance = Activator.CreateInstance<T>();
+            }
+            catch (Exception ex)
+            {
+                return new LC.XResult<T>(default(T), ex);
+            }
+
+            var eles = root.Elements();
+            foreach (var el in eles)
+            {
+                if (el.HasElements)
+                {
+                    foreach (var elx in el.Elements())
+                    {
+
+                    }
+                }
+                else
+                {
+                    var propertyInfo = targetType.GetProperty(el.Name.LocalName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
+                    if (propertyInfo != null)
+                    {
+                        var propertyValue = XConvert.TryParse(targetType, el.Value, null);
+                        if (propertyValue.Success)
+                        {
+                            propertyInfo.XSetValue(instance, propertyValue.Value);
+                        }
+                    }
+                }
+            }
 
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// 获取指定名称的驼峰命名名称
+        /// 移除UTF8编码的标记字符
         /// </summary>
-        /// <param name="name"></param>
-        public String GetCamelName(String name)
+        /// <param name="xml">要移除UTF8编码标记字符的Xml字符串</param>
+        public static String RemoveUTF8MarkChar(String xml)
         {
-            if (String.IsNullOrWhiteSpace(name))
+            String byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+            if (xml.StartsWith(byteOrderMarkUtf8))
             {
-                return String.Empty;
+                xml = xml.Remove(0, byteOrderMarkUtf8.Length);
             }
 
-            String firstChar = ((Char)(name[0] < 97 ? (name[0] + 32) : name[0])).ToString();
-            return name.Length > 1 ? firstChar + name.Substring(1) : firstChar;
-        }
-
-        /// <summary>
-        /// 获取指定名的Pascal命名名称。
-        /// </summary>
-        /// <param name="name"></param>
-        public String GetPascalName(String name)
-        {
-            if (String.IsNullOrWhiteSpace(name))
-            {
-                return String.Empty;
-            }
-
-            String firstChar = ((Char)(name[0] >= 97 ? (name[0] - 32) : name[0])).ToString();
-            return name.Length > 1 ? firstChar + name.Substring(1) : firstChar;
+            return xml;
         }
     }
 }
