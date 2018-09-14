@@ -91,11 +91,6 @@ namespace Lotus.Net.Http
             content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
             content.Headers.ContentEncoding.Add("UTF-8");
 
-            if (config != null)
-            {
-                config(_client);
-            }
-
             var respContent = await PostAsync(postUrl, content);
             if (!respContent.Success)
             {
