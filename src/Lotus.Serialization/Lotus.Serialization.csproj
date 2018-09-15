@@ -5,13 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lotus.Core\Lotus.Core.csproj" />
+    <PackageReference Include="DotNetWheels.Core" Version="1.0.30" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DotNetWheels.Core">
-      <HintPath>D:\Packages\DotNetWheels.Core\DotNetWheels.Core.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Lotus.Core\Lotus.Core.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
