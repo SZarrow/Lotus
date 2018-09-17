@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
@@ -19,7 +19,6 @@ namespace Lotus.Serialization
 
             var instanceType = value.GetType();
             typeStack.Push(instanceType);
-            //创建当前实例的属性节点
 
             while (instanceType.BaseType != null
                 && instanceType.BaseType != typeof(Object))
@@ -93,7 +92,7 @@ namespace Lotus.Serialization
             var insProperties = instanceType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.DeclaredOnly);
             if (insProperties != null && insProperties.Length > 0)
             {
-                var parentEl = stack.Peek();
+                var parentEl = stack.Count > 0 ? stack.Peek() : null;
                 foreach (var insProp in insProperties)
                 {
                     var insPropAttr = insProp.GetCustomAttribute<XElementAttribute>();
@@ -117,10 +116,23 @@ namespace Lotus.Serialization
                         Object propertyValue = insProp.XGetValue(value);
                         if (propertyValue != null)
                         {
-                            insPropEl.Value = propertyValue.ToString();
-                        }
+                            var hasChildrenXElements = (from t0 in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                            where t0.GetCustomAttribute<XElementAttribute>() != null
+                                            select t0).Count() > 0;
 
-                        parentEl.Add(insPropEl);
+                            if (hasChildrenXElements)
+                            {
+                                BuildDocTree(propertyValue, stack, insProp.PropertyType);
+                            }
+                            else
+                            {
+                                insPropEl.Value = propertyValue.ToString();
+                                if (parentEl != null)
+                                {
+                                    parentEl.Add(insPropEl);
+                                }
+                            }
+                        }
                     }
                 }
             }
