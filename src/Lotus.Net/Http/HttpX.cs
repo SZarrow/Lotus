@@ -66,9 +66,9 @@ namespace Lotus.Net.Http
                 return new XResult<TResult>(default(TResult), respContent.Exceptions.ToArray());
             }
 
-            String respString = await respContent.Value.ReadAsStringAsync();
             try
             {
+                String respString = await respContent.Value.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<TResult>(respString);
                 return new XResult<TResult>(result);
             }
@@ -98,11 +98,10 @@ namespace Lotus.Net.Http
                 return new XResult<TResult>(default(TResult), respContent.Exceptions.ToArray());
             }
 
-            var respString = await respContent.Value.ReadAsStringAsync();
-
             XSerializer serializer = new XSerializer();
             try
             {
+                var respString = await respContent.Value.ReadAsStringAsync();
                 var result = serializer.Deserialize<TResult>(respString);
                 return result != null ? new XResult<TResult>(result) : new XResult<TResult>(default(TResult), new NullReferenceException(nameof(result)));
             }

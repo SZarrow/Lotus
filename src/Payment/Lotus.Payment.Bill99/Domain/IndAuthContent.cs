@@ -1,59 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml.Serialization;
+using Lotus.Serialization;
 
-namespace Lotus.Serialization.Tests.Models
+namespace Lotus.Payment.Bill99.Domain
 {
-    /// <summary>
-    /// 签约申请返回的消息
-    /// </summary>
-    public class AgreementApplyResponse : MasMessage
+    [XElement("indAuthContent")]
+    public class IndAuthContent
     {
         /// <summary>
         /// 商户Id
         /// </summary>
         [XElement("merchantId")]
         public String MerchantId { get; set; }
+
         /// <summary>
         /// 终端Id
         /// </summary>
         [XElement("terminalId")]
         public String TerminalId { get; set; }
+
         /// <summary>
         /// 客户Id
         /// </summary>
         [XElement("customerId")]
         public String CustomerId { get; set; }
+
         /// <summary>
         /// 外部跟踪编号
         /// </summary>
         [XElement("externalRefNumber")]
         public String ExternalRefNumber { get; set; }
+
         /// <summary>
-        /// 缩略卡号
+        /// 银行卡号
         /// </summary>
-        [XElement("storablePan")]
-        public String StorablePan { get; set; }
+        [XElement("pan")]
+        public String Pan { get; set; }
+
         /// <summary>
-        /// 支付标记
+        /// 手机号码
         /// </summary>
-        [XElement("paytoken")]
-        public String Paytoken { get; set; }
+        [XElement("phoneNO")]
+        public String PhoneNO { get; set; }
+
         /// <summary>
-        /// 令牌
+        /// 接入方式，0表示商户绑定
         /// </summary>
-        [XElement("token")]
-        public String Token { get; set; }
-        /// <summary>
-        /// 应答码
-        /// </summary>
-        [XElement("responseCode")]
-        public String ResponseCode { get; set; }
-        /// <summary>
-        /// 应答码文本消息
-        /// </summary>
-        [XElement("responseTextMessage")]
-        public String ResponseTextMessage { get; set; }
+        [XElement("bindType")]
+        public String BindType { get; set; }
     }
 }

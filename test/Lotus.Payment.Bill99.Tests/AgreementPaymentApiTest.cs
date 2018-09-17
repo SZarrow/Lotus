@@ -29,17 +29,20 @@ namespace Lotus.Payment.Bill99.Tests
                 {
                     ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
 
-                    String auth = Convert.ToBase64String(Encoding.ASCII.GetBytes("104110045112012:vpos123")); 
+                    String auth = Convert.ToBase64String(Encoding.ASCII.GetBytes("104110045112012:vpos123"));
                     client.DefaultRequestHeaders.Add("Authorization", $"Basic {auth}");
                     var api = new AgreementPaymentApi(client, "104110045112012", "00002012");
                     var result = api.AgreementApply("https://sandbox.99bill.com:9445/cnp/ind_auth", new AgreementApplyRequest()
                     {
-                        BindType = "0",
-                        CustomerId = "C0001",
-                        ExternalRefNumber = "ERF0001",
-                        Pan = "6217002000038983690",
-                        PhoneNO = "13382185203",
-                        Version = "1.0"
+                        Version = "1.0",
+                        IndAuthContent = new IndAuthContent()
+                        {
+                            BindType = "0",
+                            CustomerId = "C0001",
+                            ExternalRefNumber = "ERF0001",
+                            Pan = "6217002000038983690",
+                            PhoneNO = "13382185203"
+                        }
                     });
                     Assert.True(result.Success);
                     Assert.NotNull(result.Value);

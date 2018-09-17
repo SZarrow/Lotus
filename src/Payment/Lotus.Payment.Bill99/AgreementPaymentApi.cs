@@ -51,6 +51,8 @@ namespace Lotus.Payment.Bill99
         /// <summary>
         /// 签约申请
         /// </summary>
+        /// <param name="requestUrl">请求地址</param>
+        /// <param name="request">请求内容</param>
         public XResult<AgreementApplyResponse> AgreementApply(String requestUrl, AgreementApplyRequest request)
         {
             if (String.IsNullOrWhiteSpace(requestUrl))
@@ -63,8 +65,8 @@ namespace Lotus.Payment.Bill99
                 return new XResult<AgreementApplyResponse>(null, new ArgumentNullException(nameof(request)));
             }
 
-            request.MerchantId = this.MerchantId;
-            request.TerminalId = this.TerminalId;
+            request.IndAuthContent.MerchantId = this.MerchantId;
+            request.IndAuthContent.TerminalId = this.TerminalId;
 
             String xml = _serializer.Serialize(request);
 
@@ -91,6 +93,54 @@ namespace Lotus.Payment.Bill99
             catch (Exception ex)
             {
                 return new XResult<AgreementApplyResponse>(null, ex);
+            }
+        }
+
+        /// <summary>
+        /// 签约绑卡
+        /// </summary>
+        /// <param name="requestUrl">请求地址</param>
+        /// <param name="request">请求内容</param>
+        public XResult<AgreementBindResponse> AgreementBind(String requestUrl, AgreementBindRequest request)
+        {
+            if (String.IsNullOrWhiteSpace(requestUrl))
+            {
+                return new XResult<AgreementBindResponse>(null, new ArgumentNullException(nameof(requestUrl)));
+            }
+
+            if (request == null)
+            {
+                return new XResult<AgreementBindResponse>(null, new ArgumentNullException(nameof(request)));
+            }
+
+            //request.MerchantId = this.MerchantId;
+            //request.TerminalId = this.TerminalId;
+
+            String xml = _serializer.Serialize(request);
+
+            XResult<AgreementBindResponse> result = null;
+
+            var task = _httpX.PostXmlAsync<AgreementBindResponse>(requestUrl, xml).ContinueWith(t0 =>
+            {
+                if (t0.IsCompleted)
+                {
+                    if (t0.IsCanceled || t0.IsFaulted)
+                    {
+                        throw new TaskCanceledException();
+                    }
+
+                    result = t0.Result;
+                }
+            });
+
+            try
+            {
+                task.Wait();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new XResult<AgreementBindResponse>(null, ex);
             }
         }
     }
