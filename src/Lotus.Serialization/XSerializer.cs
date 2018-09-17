@@ -19,12 +19,13 @@ namespace Lotus.Serialization
 
             var instanceType = value.GetType();
             typeStack.Push(instanceType);
+            //创建当前实例的属性节点
 
             while (instanceType.BaseType != null
                 && instanceType.BaseType != typeof(Object))
             {
-                typeStack.Push(instanceType.BaseType);
                 instanceType = instanceType.BaseType;
+                typeStack.Push(instanceType);
             }
 
             while (typeStack.Count > 0)

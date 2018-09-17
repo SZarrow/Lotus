@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Lotus.Serialization\Lotus.Serialization.csproj" />
+    <ProjectReference Include="..\..\src\Payment\Lotus.Payment.Bill99\Lotus.Payment.Bill99.csproj" />
   </ItemGroup>
 
 </Project>
