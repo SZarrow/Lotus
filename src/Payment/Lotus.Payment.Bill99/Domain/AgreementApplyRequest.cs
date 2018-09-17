@@ -12,6 +12,16 @@ namespace Lotus.Payment.Bill99.Domain
     public class AgreementApplyRequest : MasMessage
     {
         /// <summary>
+        /// 商户Id
+        /// </summary>
+        [XElement("merchantId")]
+        public String MerchantId { get; set; }
+        /// <summary>
+        /// 终端Id
+        /// </summary>
+        [XElement("terminalId")]
+        public String TerminalId { get; set; }
+        /// <summary>
         /// 客户Id
         /// </summary>
         [XElement("customerId")]

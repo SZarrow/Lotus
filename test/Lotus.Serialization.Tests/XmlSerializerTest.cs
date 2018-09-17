@@ -42,7 +42,7 @@ namespace Lotus.Serialization.Tests
         [Fact]
         public void TestDeserialize()
         {
-            String input = "<MasMessage xmlns=\"http://www.99bill.com/mas_cnp_merchant_interface\"><version>1.0</version><indAuthContent><merchantId>812025245110001</merchantId><terminalId>20130402</terminalId><customerId>99996666333331qq21111</customerId><externalRefNumber>1449910446961</externalRefNumber><storablePan>6222029273</storablePan><paytoken>6227189123456786789</paytoken><token>206111</token><responseCode>00</responseCode><responseTextMessage>交易成功</responseTextMessage></indAuthContent></MasMessage>";
+            String input = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><MasMessage xmlns=\"http://www.99bill.com/mas_cnp_merchant_interface\"><version>1.0</version><indAuthContent><merchantId>104110045112012</merchantId><terminalId>00002012</terminalId><customerId>C0001</customerId><externalRefNumber>ERF0001</externalRefNumber><storablePan>6217003690</storablePan><token>9001223771</token><responseCode>00</responseCode><responseTextMessage>交易成功</responseTextMessage></indAuthContent></MasMessage>";
 
             var xs = new XSerializer();
             var result = xs.Deserialize<AgreementApplyResponse>(input);

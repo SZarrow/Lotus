@@ -166,6 +166,7 @@ namespace Lotus.Serialization
 
         private void SetValue<T>(Type targetType, T instance, XElement el)
         {
+            var ps = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
             var propertyInfo = (from p in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                                 let cusAttr = p.GetCustomAttribute<XElementAttribute>()
                                 where cusAttr != null && cusAttr.ElementName == el.Name.LocalName
@@ -173,7 +174,7 @@ namespace Lotus.Serialization
 
             if (propertyInfo != null)
             {
-                var propertyValueResult = XConvert.TryParse(targetType, el.Value, null);
+                var propertyValueResult = XConvert.TryParse(propertyInfo.PropertyType, el.Value, null);
                 if (propertyValueResult.Success)
                 {
                     propertyInfo.XSetValue(instance, propertyValueResult.Value);

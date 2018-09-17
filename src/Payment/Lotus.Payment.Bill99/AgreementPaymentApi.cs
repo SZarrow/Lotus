@@ -53,6 +53,19 @@ namespace Lotus.Payment.Bill99
         /// </summary>
         public XResult<AgreementApplyResponse> AgreementApply(String requestUrl, AgreementApplyRequest request)
         {
+            if (String.IsNullOrWhiteSpace(requestUrl))
+            {
+                return new XResult<AgreementApplyResponse>(null, new ArgumentNullException(nameof(requestUrl)));
+            }
+
+            if (request == null)
+            {
+                return new XResult<AgreementApplyResponse>(null, new ArgumentNullException(nameof(request)));
+            }
+
+            request.MerchantId = this.MerchantId;
+            request.TerminalId = this.TerminalId;
+
             String xml = _serializer.Serialize(request);
 
             XResult<AgreementApplyResponse> result = null;

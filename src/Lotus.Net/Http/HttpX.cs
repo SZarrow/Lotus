@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -88,7 +89,7 @@ namespace Lotus.Net.Http
         public async Task<XResult<TResult>> PostXmlAsync<TResult>(String postUrl, String xml)
         {
             HttpContent content = new StringContent(xml);
-            content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             content.Headers.ContentEncoding.Add("UTF-8");
 
             var respContent = await PostAsync(postUrl, content);
@@ -98,6 +99,7 @@ namespace Lotus.Net.Http
             }
 
             var respString = await respContent.Value.ReadAsStringAsync();
+
             XSerializer serializer = new XSerializer();
             try
             {
