@@ -13,6 +13,8 @@ namespace Lotus.CommonService.Controllers
     [ApiController]
     public class RSAController : ControllerBase
     {
+        private const String OpenSSLFilePath = @"D:\openssl\bin\openssl.exe";
+
         [HttpPost]
         public ActionResult GenKeyPairs()
         {
@@ -36,7 +38,7 @@ namespace Lotus.CommonService.Controllers
             String privateKeySavePath = Path.Combine(cacheDir, privateKeyPemFileName);
             try
             {
-                var p = Process.Start("openssl", $"genrsa -out {privateKeySavePath} 1024");
+                var p = Process.Start(OpenSSLFilePath, $"genrsa -out {privateKeySavePath} 1024");
                 p.WaitForExit();
             }
             catch (Exception ex)
@@ -65,7 +67,7 @@ namespace Lotus.CommonService.Controllers
             String publicKeySavePath = Path.Combine(cacheDir, publicKeyPemFileName);
             try
             {
-                var p = Process.Start("openssl", $"rsa -pubout -in {privateKeySavePath} -out {publicKeySavePath}");
+                var p = Process.Start(OpenSSLFilePath , $"rsa -pubout -in {privateKeySavePath} -out {publicKeySavePath}");
                 p.WaitForExit();
             }
             catch (Exception ex)
