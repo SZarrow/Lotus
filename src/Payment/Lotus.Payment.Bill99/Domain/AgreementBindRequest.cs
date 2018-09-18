@@ -5,9 +5,9 @@ using Lotus.Serialization;
 
 namespace Lotus.Payment.Bill99.Domain
 {
-    [XElement("indAuthDynVerifyContent")]
-    public class AgreementBindRequest
+    public class AgreementBindRequest : MasMessage
     {
-
+        [XElement("indAuthDynVerifyContent")]
+        public IndAuthDynVerifyRequestContent IndAuthDynVerifyContent { get; set; }
     }
 }

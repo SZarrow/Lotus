@@ -65,10 +65,26 @@ namespace Lotus.Payment.Bill99
                 return new XResult<AgreementApplyResponse>(null, new ArgumentNullException(nameof(request)));
             }
 
-            request.IndAuthContent.MerchantId = this.MerchantId;
-            request.IndAuthContent.TerminalId = this.TerminalId;
+            String xml = _serializer.Serialize(request, doc =>
+            {
+                var indAuthContentEl = doc.Root.Element(XName.Get("indAuthContent", doc.Root.Name.NamespaceName));
+                if (indAuthContentEl != null)
+                {
+                    var terminalIdEl = new XElement("terminalId", this.TerminalId);
+                    if (!String.IsNullOrWhiteSpace(indAuthContentEl.Name.NamespaceName))
+                    {
+                        terminalIdEl.Name = XName.Get(terminalIdEl.Name.LocalName, indAuthContentEl.Name.NamespaceName);
+                    }
+                    indAuthContentEl.AddFirst(terminalIdEl);
 
-            String xml = _serializer.Serialize(request);
+                    var merchantIdEl = new XElement("merchantId", this.MerchantId);
+                    if (!String.IsNullOrWhiteSpace(indAuthContentEl.Name.NamespaceName))
+                    {
+                        merchantIdEl.Name = XName.Get(merchantIdEl.Name.LocalName, indAuthContentEl.Name.NamespaceName);
+                    }
+                    indAuthContentEl.AddFirst(merchantIdEl);
+                }
+            });
 
             XResult<AgreementApplyResponse> result = null;
 
@@ -97,11 +113,11 @@ namespace Lotus.Payment.Bill99
         }
 
         /// <summary>
-        /// 签约绑卡
+        /// 签约验证
         /// </summary>
         /// <param name="requestUrl">请求地址</param>
         /// <param name="request">请求内容</param>
-        public XResult<AgreementBindResponse> AgreementBind(String requestUrl, AgreementBindRequest request)
+        public XResult<AgreementBindResponse> AgreementVerify(String requestUrl, AgreementBindRequest request)
         {
             if (String.IsNullOrWhiteSpace(requestUrl))
             {
@@ -113,10 +129,19 @@ namespace Lotus.Payment.Bill99
                 return new XResult<AgreementBindResponse>(null, new ArgumentNullException(nameof(request)));
             }
 
-            //request.MerchantId = this.MerchantId;
-            //request.TerminalId = this.TerminalId;
-
-            String xml = _serializer.Serialize(request);
+            String xml = _serializer.Serialize(request, doc =>
+            {
+                var indAuthDynVerifyContentEl = doc.Root.Element(XName.Get("indAuthDynVerifyContent", doc.Root.Name.NamespaceName));
+                if (indAuthDynVerifyContentEl != null)
+                {
+                    var merchantIdEl = new XElement("merchantId", this.MerchantId);
+                    if (!String.IsNullOrWhiteSpace(indAuthDynVerifyContentEl.Name.NamespaceName))
+                    {
+                        merchantIdEl.Name = XName.Get(merchantIdEl.Name.LocalName, indAuthDynVerifyContentEl.Name.NamespaceName);
+                    }
+                    indAuthDynVerifyContentEl.AddFirst(merchantIdEl);
+                }
+            });
 
             XResult<AgreementBindResponse> result = null;
 
@@ -126,7 +151,7 @@ namespace Lotus.Payment.Bill99
                 {
                     if (t0.IsCanceled || t0.IsFaulted)
                     {
-                        throw new TaskCanceledException();
+                        throw new TaskCanceledException($"RequestUrl:{requestUrl},Content:{xml}");
                     }
 
                     result = t0.Result;
@@ -142,6 +167,11 @@ namespace Lotus.Payment.Bill99
             {
                 return new XResult<AgreementBindResponse>(null, ex);
             }
+        }
+
+        public XResult<Object> AgreementPay()
+        {
+            throw new NotImplementedException();
         }
     }
 }

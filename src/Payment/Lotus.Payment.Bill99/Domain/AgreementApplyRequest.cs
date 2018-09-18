@@ -10,6 +10,6 @@ namespace Lotus.Payment.Bill99.Domain
     public class AgreementApplyRequest : MasMessage
     {
         [XElement("indAuthContent")]
-        public IndAuthContent IndAuthContent { get; set; }
+        public IndAuthRequestContent IndAuthContent { get; set; }
     }
 }

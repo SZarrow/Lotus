@@ -16,10 +16,8 @@ namespace Lotus.Serialization.Tests
             var model = new AgreementApplyRequest()
             {
                 Version = "1.0",
-                IndAuthContent = new IndAuthContent()
+                IndAuthContent = new IndAuthRequestContent()
                 {
-                    MerchantId = "M0001",
-                    TerminalId = "T0001",
                     BindType = "0",
                     CustomerId = "C0001",
                     ExternalRefNumber = "ERF0001",
