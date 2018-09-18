@@ -39,11 +39,6 @@ namespace Lotus.Net.Http
                 return new XResult<HttpContent>(null, ex);
             }
 
-            if (respMsg == null || respMsg.Content == null)
-            {
-                return new XResult<HttpContent>(null);
-            }
-
             try
             {
                 return new XResult<HttpContent>(respMsg.Content);
@@ -111,47 +106,25 @@ namespace Lotus.Net.Http
             }
         }
 
-        public async Task<XResult<TResult>> GetAsync<TResult>(String requestUrl)
+        public async Task<XResult<HttpContent>> GetAsync<TResult>(String requestUrl)
         {
             HttpResponseMessage respMsg = null;
-            TResult DefaultResult = default(TResult);
             try
             {
                 respMsg = await _client.GetAsync(requestUrl);
             }
             catch (Exception ex)
             {
-                return new XResult<TResult>(DefaultResult, ex);
-            }
-
-            if (respMsg == null || respMsg.Content == null)
-            {
-                return new XResult<TResult>(DefaultResult);
-            }
-
-            String readString = null;
-            try
-            {
-                readString = await respMsg.Content.ReadAsStringAsync();
-            }
-            catch (Exception ex)
-            {
-                return new XResult<TResult>(default(TResult), ex);
-            }
-
-            if (String.IsNullOrWhiteSpace(readString))
-            {
-                return new XResult<TResult>(DefaultResult);
+                return new XResult<HttpContent>(null, ex);
             }
 
             try
             {
-                var result = JsonConvert.DeserializeObject<TResult>(readString);
-                return new XResult<TResult>(result);
+                return new XResult<HttpContent>(respMsg.Content);
             }
             catch (Exception ex)
             {
-                return new XResult<TResult>(DefaultResult, ex);
+                return new XResult<HttpContent>(null, ex);
             }
         }
 
