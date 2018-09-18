@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lotus.Net\Lotus.Net.csproj" />
+    <ProjectReference Include="..\..\Lotus.Serialization\Lotus.Serialization.csproj" />
+  </ItemGroup>
+
+</Project>
