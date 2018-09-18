@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Lotus.Core;
-using System.Collections.Generic;
 
 namespace Lotus.Security
 {
@@ -339,15 +339,6 @@ namespace Lotus.Security
             catch (Exception ex)
             {
                 return new XResult<Boolean>(false, ex);
-            }
-        }
-
-        public XResult<KeyValuePair<String, String>> MakeRSAKeyPairs()
-        {
-            using (var rsa = RSA.Create())
-            {
-                String result = rsa.ToXmlString(true);
-                return new XResult<KeyValuePair<String, String>>(new KeyValuePair<String, String>(result, result));
             }
         }
 
