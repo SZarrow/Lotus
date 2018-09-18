@@ -11,7 +11,7 @@ namespace Lotus.Serialization
 {
     public class XSerializer
     {
-        public String Serialize(Object value)
+        public String Serialize(Object value, Action<XDocument> configDoc = null)
         {
             var doc = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"));
             var eleStack = new Stack<XElement>();
@@ -54,6 +54,11 @@ namespace Lotus.Serialization
             }
 
             doc.Add(rootEl);
+
+            if (configDoc != null)
+            {
+                configDoc(doc);
+            }
 
             using (var ms = new MemoryStream())
             {
@@ -114,12 +119,12 @@ namespace Lotus.Serialization
                         }
 
                         Object propertyValue = insProp.XGetValue(value);
+                        Boolean hasChildrenXElements = (from t0 in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                                        where t0.GetCustomAttribute<XElementAttribute>() != null
+                                                        select t0).Count() > 0;
+
                         if (propertyValue != null)
                         {
-                            var hasChildrenXElements = (from t0 in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                            where t0.GetCustomAttribute<XElementAttribute>() != null
-                                            select t0).Count() > 0;
-
                             if (hasChildrenXElements)
                             {
                                 BuildDocTree(propertyValue, stack, insProp.PropertyType);
@@ -127,11 +132,12 @@ namespace Lotus.Serialization
                             else
                             {
                                 insPropEl.Value = propertyValue.ToString();
-                                if (parentEl != null)
-                                {
-                                    parentEl.Add(insPropEl);
-                                }
                             }
+                        }
+
+                        if (parentEl != null && !hasChildrenXElements)
+                        {
+                            parentEl.Add(insPropEl);
                         }
                     }
                 }
@@ -173,32 +179,58 @@ namespace Lotus.Serialization
                 return default(T);
             }
 
-            SetValue(targetType, instance, doc.Root);
+            Fill(instance, doc.Root);
+
             return instance;
         }
 
-        private void SetValue<T>(Type targetType, T instance, XElement el)
+        private void Fill<T>(T value, XElement root)
         {
-            var ps = targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
-            var propertyInfo = (from p in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
-                                let cusAttr = p.GetCustomAttribute<XElementAttribute>()
-                                where cusAttr != null && cusAttr.ElementName == el.Name.LocalName
-                                select p).FirstOrDefault();
+            var valueType = typeof(T);
+            var xelProperties = from p in valueType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
+                                let xelAttr = p.GetCustomAttribute<XElementAttribute>()
+                                where xelAttr != null
+                                select new { XName = xelAttr.ElementName, Property = p };
 
-            if (propertyInfo != null)
+            var xels = root.Elements();
+            foreach (var xel in xels)
             {
-                var propertyValueResult = XConvert.TryParse(propertyInfo.PropertyType, el.Value, null);
-                if (propertyValueResult.Success)
+                var xelProp = xelProperties.FirstOrDefault(x => x.XName == xel.Name.LocalName);
+                if (xelProp != null)
                 {
-                    propertyInfo.XSetValue(instance, propertyValueResult.Value);
+                    SetProperty(value, xelProp.Property, xel);
                 }
             }
 
-            if (el.HasElements)
+        }
+
+        private void SetProperty(Object instance, PropertyInfo property, XElement xel)
+        {
+            if (xel.HasElements)
             {
-                foreach (var childEl in el.Elements())
+                var newIns = Activator.CreateInstance(property.PropertyType);
+                var properties = from p in property.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
+                                 let xelAttr = p.GetCustomAttribute<XElementAttribute>()
+                                 where xelAttr != null
+                                 select new { XName = xelAttr.ElementName, Property = p };
+
+                foreach (var xelChild in xel.Elements())
                 {
-                    SetValue(targetType, instance, childEl);
+                    var insProp = properties.FirstOrDefault(x => x.XName == xelChild.Name.LocalName);
+                    if (insProp != null)
+                    {
+                        SetProperty(newIns, insProp.Property, xelChild);
+                    }
+                }
+
+                property.XSetValue(instance, newIns);
+            }
+            else
+            {
+                var propertyValueResult = XConvert.TryParse(property.PropertyType, xel.Value, null);
+                if (propertyValueResult.Success)
+                {
+                    property.XSetValue(instance, propertyValueResult.Value);
                 }
             }
         }

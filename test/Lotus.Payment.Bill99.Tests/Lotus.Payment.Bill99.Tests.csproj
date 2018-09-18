@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Lotus.Logging\Lotus.Logging.csproj" />
     <ProjectReference Include="..\..\src\Payment\Lotus.Payment.Bill99\Lotus.Payment.Bill99.csproj" />
   </ItemGroup>
 
