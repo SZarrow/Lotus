@@ -55,11 +55,6 @@ namespace Lotus.Security
             return _rsaProvider.Decrypt(stream, privateKeyPem);
         }
 
-        public static XResult<KeyValuePair<String, String>> MakeRSAKeyPairs()
-        {
-            return _rsaProvider.MakeRSAKeyPairs();
-        }
-
         public static XResult<String> MakeSign(String signContent, String privateKeyPem, HashAlgorithmName algName)
         {
             if (String.IsNullOrWhiteSpace(signContent))
