@@ -31,7 +31,7 @@ namespace Lotus.Serialization
             while (typeStack.Count > 0)
             {
                 var type = typeStack.Pop();
-                BuildDocTree(value, eleStack, type);
+                BuildDocTree(type, value, eleStack);
             }
 
             XElement rootEl = null;
@@ -46,6 +46,10 @@ namespace Lotus.Serialization
                 {
                     rootEl = parentEl;
                     break;
+                }
+                else
+                {
+                    eleStack.Peek().Add(parentEl);
                 }
             }
 
@@ -69,9 +73,9 @@ namespace Lotus.Serialization
             }
         }
 
-        private void BuildDocTree(Object value, Stack<XElement> stack, Type instanceType)
+        private void BuildDocTree(Type nodeType, Object nodeValue, Stack<XElement> stack)
         {
-            var insCusAttr = instanceType.GetCustomAttribute<XElementAttribute>(false);
+            var insCusAttr = nodeType.GetCustomAttribute<XElementAttribute>(false);
             if (insCusAttr != null)
             {
                 var xel = new XElement(insCusAttr.ElementName);
@@ -95,13 +99,13 @@ namespace Lotus.Serialization
                 stack.Push(xel);
             }
 
-            var insProperties = instanceType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.DeclaredOnly);
+            var insProperties = nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.DeclaredOnly);
             if (insProperties != null && insProperties.Length > 0)
             {
                 var parentEl = stack.Count > 0 ? stack.Peek() : null;
                 foreach (var insProp in insProperties)
                 {
-                    Object propertyValue = insProp.XGetValue(value);
+                    Object propertyValue = insProp.XGetValue(nodeValue);
 
                     var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
                     if (insPropXElAttr != null)
@@ -129,7 +133,7 @@ namespace Lotus.Serialization
                         {
                             if (hasChildrenXElements)
                             {
-                                BuildDocTree(propertyValue, stack, insProp.PropertyType);
+                                BuildDocTree(insProp.PropertyType, propertyValue, stack);
                             }
                             else
                             {
@@ -143,22 +147,33 @@ namespace Lotus.Serialization
                         }
                     }
 
+                    //序列化集合
                     var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
                     if (insPropXCoAttr != null)
                     {
                         var collection = propertyValue as IEnumerable;
+                        var newStack = new Stack<XElement>();
+
+                        if (parentEl != null)
+                        {
+                            newStack.Push(parentEl);
+                        }
+
                         foreach (var item in collection)
                         {
-                            BuildDocTree(item, stack, item.GetType());
+                            BuildDocTree(item.GetType(), item, newStack);
+                        }
+
+                        if (newStack.Count > 0 && parentEl != null)
+                        {
+                            while (newStack.Count > 0)
+                            {
+                                parentEl.Add(newStack.Pop());
+                            }
                         }
                     }
                 }
             }
-        }
-
-        private void BuildCollectionTree()
-        {
-
         }
 
         public T Deserialize<T>(String xml)
