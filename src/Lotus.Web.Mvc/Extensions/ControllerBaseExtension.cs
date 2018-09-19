@@ -16,5 +16,10 @@ namespace Microsoft.AspNetCore.Mvc
         {
             return new JsonResult(new { Status = "SUCCESS", Value = value });
         }
+
+        public static JsonResult FormatJson(this ControllerBase controller, String status, Object value)
+        {
+            return new JsonResult(new { Status = status, Value = value });
+        }
     }
 }

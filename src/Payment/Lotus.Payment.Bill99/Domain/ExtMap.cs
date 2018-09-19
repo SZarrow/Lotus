@@ -5,9 +5,10 @@ using Lotus.Serialization;
 
 namespace Lotus.Payment.Bill99.Domain
 {
-    public class AgreementPayRequest : MasMessage
+    [XElement("extMap")]
+    public class ExtMap
     {
-        [XElement("TxnMsgContent")]
-        public TxnMsgRequestContent TxnMsgContent { get; set; }
+        [XCollection]
+        public IEnumerable<ExtDate> ExtDates { get; set; }
     }
 }
