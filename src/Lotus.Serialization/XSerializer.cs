@@ -230,7 +230,7 @@ namespace Lotus.Serialization
             {
                 if (xel.HasElements)
                 {
-
+                    //todo
                 }
                 else
                 {
