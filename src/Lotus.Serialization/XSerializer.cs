@@ -221,16 +221,24 @@ namespace Lotus.Serialization
             var valueType = typeof(T);
             var xelProperties = from p in valueType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                                 let xelAttr = p.GetCustomAttribute<XElementAttribute>()
-                                where xelAttr != null
-                                select new { XName = xelAttr.ElementName, Property = p };
+                                let xcoAttr = p.GetCustomAttribute<XCollectionAttribute>()
+                                where xelAttr != null || xcoAttr != null
+                                select new Tuple<XElementAttribute, XCollectionAttribute, PropertyInfo>(xelAttr, xcoAttr, p);
 
             var xels = root.Elements();
             foreach (var xel in xels)
             {
-                var xelProp = xelProperties.FirstOrDefault(x => x.XName == xel.Name.LocalName);
-                if (xelProp != null)
+                if (xel.HasElements)
                 {
-                    SetProperty(value, xelProp.Property, xel);
+
+                }
+                else
+                {
+                    var xelProp = xelProperties.FirstOrDefault(x => x.Item1 != null && x.Item1.ElementName == xel.Name.LocalName);
+                    if (xelProp != null)
+                    {
+                        SetProperty(value, xelProp.Item3, xel);
+                    }
                 }
             }
         }
