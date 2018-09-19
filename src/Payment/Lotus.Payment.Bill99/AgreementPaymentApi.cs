@@ -169,7 +169,7 @@ namespace Lotus.Payment.Bill99
             }
         }
 
-        public XResult<Object> AgreementPay()
+        public XResult<AgreementPayResponse> AgreementPay(String requestUrl, AgreementPayRequest request)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -100,27 +101,28 @@ namespace Lotus.Serialization
                 var parentEl = stack.Count > 0 ? stack.Peek() : null;
                 foreach (var insProp in insProperties)
                 {
-                    var insPropAttr = insProp.GetCustomAttribute<XElementAttribute>();
-                    if (insPropAttr != null)
-                    {
-                        var insPropEl = new XElement(insPropAttr.ElementName);
+                    Object propertyValue = insProp.XGetValue(value);
 
-                        if (!String.IsNullOrWhiteSpace(insPropAttr.Namespace))
+                    var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
+                    if (insPropXElAttr != null)
+                    {
+                        var insPropEl = new XElement(insPropXElAttr.ElementName);
+                        if (!String.IsNullOrWhiteSpace(insPropXElAttr.Namespace))
                         {
-                            insPropEl.Name = XName.Get(insPropAttr.ElementName, insPropAttr.Namespace);
+                            insPropEl.Name = XName.Get(insPropXElAttr.ElementName, insPropXElAttr.Namespace);
                         }
                         else
                         {
                             String parentNamespace = stack.Count > 0 ? stack.Peek().Name.NamespaceName : null;
                             if (!String.IsNullOrWhiteSpace(parentNamespace))
                             {
-                                insPropEl.Name = XName.Get(insPropAttr.ElementName, parentNamespace);
+                                insPropEl.Name = XName.Get(insPropXElAttr.ElementName, parentNamespace);
                             }
                         }
 
-                        Object propertyValue = insProp.XGetValue(value);
                         Boolean hasChildrenXElements = (from t0 in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                                         where t0.GetCustomAttribute<XElementAttribute>() != null
+                                                        || t0.GetCustomAttribute<XCollectionAttribute>() != null
                                                         select t0).Count() > 0;
 
                         if (propertyValue != null)
@@ -140,8 +142,23 @@ namespace Lotus.Serialization
                             parentEl.Add(insPropEl);
                         }
                     }
+
+                    var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
+                    if (insPropXCoAttr != null)
+                    {
+                        var collection = propertyValue as IEnumerable;
+                        foreach (var item in collection)
+                        {
+                            BuildDocTree(item, stack, item.GetType());
+                        }
+                    }
                 }
             }
+        }
+
+        private void BuildCollectionTree()
+        {
+
         }
 
         public T Deserialize<T>(String xml)
@@ -201,7 +218,6 @@ namespace Lotus.Serialization
                     SetProperty(value, xelProp.Property, xel);
                 }
             }
-
         }
 
         private void SetProperty(Object instance, PropertyInfo property, XElement xel)

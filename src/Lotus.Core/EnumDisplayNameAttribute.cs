@@ -10,17 +10,11 @@ namespace Lotus.Core
     [AttributeUsage(AttributeTargets.Field)]
     public class EnumDisplayNameAttribute : Attribute
     {
-
-        private String _displayName;
-
-        public String DisplayName
-        {
-            get { return _displayName; }
-        }
+        public String DisplayName { get; }
 
         public EnumDisplayNameAttribute(String displayName)
         {
-            _displayName = displayName;
+            this.DisplayName = displayName;
         }
     }
 }
