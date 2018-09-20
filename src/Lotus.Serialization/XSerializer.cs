@@ -79,24 +79,7 @@ namespace Lotus.Serialization
             var insCusAttr = nodeType.GetCustomAttribute<XElementAttribute>(false);
             if (insCusAttr != null)
             {
-                var xel = new XElement(insCusAttr.ElementName);
-
-                //如果当前节点自己有命名空间，则添加自己的命名空间
-                if (!String.IsNullOrWhiteSpace(insCusAttr.Namespace))
-                {
-                    xel.Name = XName.Get(insCusAttr.ElementName, insCusAttr.Namespace);
-                }
-                else
-                {
-                    //如果当前节点自己没有命名空间，但是父节点有命名空间，
-                    //则将使用父节点的命名作为自己的命名空间
-                    String parentNamespace = stack.Count > 0 ? stack.Peek().Name.NamespaceName : null;
-                    if (!String.IsNullOrWhiteSpace(parentNamespace))
-                    {
-                        xel.Name = XName.Get(insCusAttr.ElementName, parentNamespace);
-                    }
-                }
-
+                var xel = CreateXElement(insCusAttr, stack.Count > 0 ? stack.Peek() : null);
                 stack.Push(xel);
             }
 
@@ -106,73 +89,58 @@ namespace Lotus.Serialization
                 var parentEl = stack.Count > 0 ? stack.Peek() : null;
                 foreach (var insProp in insProperties)
                 {
-                    Object propertyValue = insProp.XGetValue(nodeValue);
-
                     var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
                     if (insPropXElAttr != null)
                     {
-                        var insPropEl = new XElement(insPropXElAttr.ElementName);
-                        if (!String.IsNullOrWhiteSpace(insPropXElAttr.Namespace))
+                        var insPropEl = CreateXElement(insPropXElAttr, parentEl);
+
+                        Object propertyValue = insProp.XGetValue(nodeValue);
+
+                        var childrenProperties = (from p in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                                  where p.GetCustomAttribute<XElementAttribute>() != null
+                                                  || p.GetCustomAttribute<XCollectionAttribute>() != null
+                                                  select p).ToArray();
+
+                        if (childrenProperties.Length == 0)
                         {
-                            insPropEl.Name = XName.Get(insPropXElAttr.ElementName, insPropXElAttr.Namespace);
+                            insPropEl.Value = propertyValue.ToString();
+
+                            if (parentEl != null)
+                            {
+                                parentEl.Add(insPropEl);
+                            }
                         }
                         else
                         {
-                            String parentNamespace = stack.Count > 0 ? stack.Peek().Name.NamespaceName : null;
-                            if (!String.IsNullOrWhiteSpace(parentNamespace))
-                            {
-                                insPropEl.Name = XName.Get(insPropXElAttr.ElementName, parentNamespace);
-                            }
-                        }
 
-                        Boolean hasChildrenXElements = (from t0 in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                                        where t0.GetCustomAttribute<XElementAttribute>() != null
-                                                        || t0.GetCustomAttribute<XCollectionAttribute>() != null
-                                                        select t0).Count() > 0;
-
-                        if (propertyValue != null)
-                        {
-                            if (hasChildrenXElements)
-                            {
-                                BuildDocTree(insProp.PropertyType, propertyValue, stack);
-                            }
-                            else
-                            {
-                                insPropEl.Value = propertyValue.ToString();
-                            }
-                        }
-
-                        if (parentEl != null && !hasChildrenXElements)
-                        {
-                            parentEl.Add(insPropEl);
                         }
                     }
 
-                    //序列化集合
-                    var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
-                    if (insPropXCoAttr != null)
-                    {
-                        var collection = propertyValue as IEnumerable;
-                        var newStack = new Stack<XElement>();
+                    ////序列化集合
+                    //var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
+                    //if (insPropXCoAttr != null)
+                    //{
+                    //    var collection = propertyValue as IEnumerable;
+                    //    var newStack = new Stack<XElement>();
 
-                        if (parentEl != null)
-                        {
-                            newStack.Push(parentEl);
-                        }
+                    //    if (parentEl != null)
+                    //    {
+                    //        newStack.Push(parentEl);
+                    //    }
 
-                        foreach (var item in collection)
-                        {
-                            BuildDocTree(item.GetType(), item, newStack);
-                        }
+                    //    foreach (var item in collection)
+                    //    {
+                    //        BuildDocTree(item.GetType(), item, newStack);
+                    //    }
 
-                        if (newStack.Count > 0 && parentEl != null)
-                        {
-                            while (newStack.Count > 0)
-                            {
-                                parentEl.Add(newStack.Pop());
-                            }
-                        }
-                    }
+                    //    if (newStack.Count > 0 && parentEl != null)
+                    //    {
+                    //        while (newStack.Count > 0)
+                    //        {
+                    //            parentEl.Add(newStack.Pop());
+                    //        }
+                    //    }
+                    //}
                 }
             }
         }
@@ -270,9 +238,7 @@ namespace Lotus.Serialization
                         foreach (var el in xel.Elements())
                         {
                             var listItem = Activator.CreateInstance(genericTypes[0]);
-
                             Fill(listItem, el);
-
                             list.Add(listItem);
                         }
 
@@ -298,6 +264,32 @@ namespace Lotus.Serialization
                     property.XSetValue(instance, propertyValueResult.Value);
                 }
             }
+        }
+
+        private XElement CreateXElement(XElementAttribute elementAttribute, XElement parent)
+        {
+            var element = new XElement(elementAttribute.ElementName);
+
+            //如果当前节点自己有命名空间，则添加自己的命名空间
+            if (!String.IsNullOrWhiteSpace(elementAttribute.Namespace))
+            {
+                element.Name = XName.Get(element.Name.LocalName, elementAttribute.Namespace);
+            }
+            else
+            {
+                //如果当前节点自己没有命名空间，但是父节点有命名空间，
+                //则将使用父节点的命名作为自己的命名空间
+                if (parent != null)
+                {
+                    String parentNamespace = parent.Name.NamespaceName;
+                    if (!String.IsNullOrWhiteSpace(parentNamespace))
+                    {
+                        element.Name = XName.Get(element.Name.LocalName, parentNamespace);
+                    }
+                }
+            }
+
+            return element;
         }
 
         /// <summary>
