@@ -43,12 +43,12 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, privateKeySavePath + "|" + ex.Message);
+                return this.Failure(null, privateKeySavePath + "|" + ex.Message);
             }
 
             if (!System.IO.File.Exists(privateKeySavePath))
             {
-                return this.FormatJson(null, $"File '{privateKeySavePath}' not found.");
+                return this.Failure(null, $"File '{privateKeySavePath}' not found.");
             }
 
             String privateKey = null;
@@ -61,7 +61,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
 
             String publicKeySavePath = Path.Combine(cacheDir, publicKeyPemFileName);
@@ -72,12 +72,12 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
 
             if (!System.IO.File.Exists(publicKeySavePath))
             {
-                return this.FormatJson(null, $"File '{publicKeySavePath}' not found.");
+                return this.Failure(null, $"File '{publicKeySavePath}' not found.");
             }
 
             String publicKey = null;
@@ -90,7 +90,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
 
             try
@@ -98,7 +98,7 @@ namespace Lotus.CommonService.Controllers
                 System.IO.File.Delete(privateKeySavePath);
                 System.IO.File.Delete(publicKeySavePath);
 
-                return this.FormatJson(new
+                return this.Success(new
                 {
                     PrivateKey = privateKey,
                     PublicKey = publicKey
@@ -106,7 +106,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
         }
     }
