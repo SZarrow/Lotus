@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -216,29 +217,33 @@ namespace Lotus.Serialization
             return instance;
         }
 
-        private void Fill<T>(T value, XElement root)
+        private void Fill(Object value, XElement root)
         {
-            var valueType = typeof(T);
+            var valueType = value.GetType();
             var xelProperties = from p in valueType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                                 let xelAttr = p.GetCustomAttribute<XElementAttribute>()
                                 let xcoAttr = p.GetCustomAttribute<XCollectionAttribute>()
                                 where xelAttr != null || xcoAttr != null
-                                select new Tuple<XElementAttribute, XCollectionAttribute, PropertyInfo>(xelAttr, xcoAttr, p);
+                                select new
+                                {
+                                    XElementAttribute = xelAttr,
+                                    XCollectionAttribute = xcoAttr,
+                                    PropertyInfo = p
+                                };
 
-            var xels = root.Elements();
-            foreach (var xel in xels)
+            foreach (var xelProp in xelProperties)
             {
-                if (xel.HasElements)
+                if (xelProp.XElementAttribute != null)
                 {
-                    //todo
-                }
-                else
-                {
-                    var xelProp = xelProperties.FirstOrDefault(x => x.Item1 != null && x.Item1.ElementName == xel.Name.LocalName);
-                    if (xelProp != null)
+                    var xel = root.Elements().FirstOrDefault(x => x.Name.LocalName == xelProp.XElementAttribute.ElementName);
+                    if (xel != null)
                     {
-                        SetProperty(value, xelProp.Item3, xel);
+                        SetProperty(value, xelProp.PropertyInfo, xel);
                     }
+                }
+                else if (xelProp.XCollectionAttribute != null)
+                {
+
                 }
             }
         }
@@ -250,15 +255,36 @@ namespace Lotus.Serialization
                 var newIns = Activator.CreateInstance(property.PropertyType);
                 var properties = from p in property.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                                  let xelAttr = p.GetCustomAttribute<XElementAttribute>()
-                                 where xelAttr != null
-                                 select new { XName = xelAttr.ElementName, Property = p };
+                                 let xcoAttr = p.GetCustomAttribute<XCollectionAttribute>()
+                                 where xelAttr != null || xcoAttr != null
+                                 select new { ElementName = xelAttr != null ? xelAttr.ElementName : String.Empty, IsCollection = (xcoAttr != null), Property = p };
 
-                foreach (var xelChild in xel.Elements())
+                foreach (var childProp in properties)
                 {
-                    var insProp = properties.FirstOrDefault(x => x.XName == xelChild.Name.LocalName);
-                    if (insProp != null)
+                    if (childProp.IsCollection)
                     {
-                        SetProperty(newIns, insProp.Property, xelChild);
+                        var genericTypes = childProp.Property.PropertyType.GenericTypeArguments;
+                        var listType = typeof(List<>).MakeGenericType(genericTypes);
+                        var list = listType.GetConstructor(Type.EmptyTypes).XConstruct(null) as IList;
+
+                        foreach (var el in xel.Elements())
+                        {
+                            var listItem = Activator.CreateInstance(genericTypes[0]);
+
+                            Fill(listItem, el);
+
+                            list.Add(listItem);
+                        }
+
+                        childProp.Property.XSetValue(newIns, list);
+                    }
+                    else
+                    {
+                        var xelChild = xel.Elements().FirstOrDefault(x => x.Name.LocalName == childProp.ElementName);
+                        if (xelChild != null)
+                        {
+                            SetProperty(newIns, childProp.Property, xelChild);
+                        }
                     }
                 }
 
