@@ -270,9 +270,7 @@ namespace Lotus.Serialization
                         foreach (var el in xel.Elements())
                         {
                             var listItem = Activator.CreateInstance(genericTypes[0]);
-
                             Fill(listItem, el);
-
                             list.Add(listItem);
                         }
 
