@@ -63,8 +63,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Serialization.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scheduler", "Scheduler", "{DF0F19B9-B25E-4D5B-A248-80CA246D43A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Scheduler.Quartz", "src\Scheduler\Lotus.Scheduler.Quartz\Lotus.Scheduler.Quartz.csproj", "{0CE6E86D-45F4-4454-8B7A-5F29ABBF8357}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,10 +161,6 @@ Global
 		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0CE6E86D-45F4-4454-8B7A-5F29ABBF8357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0CE6E86D-45F4-4454-8B7A-5F29ABBF8357}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0CE6E86D-45F4-4454-8B7A-5F29ABBF8357}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0CE6E86D-45F4-4454-8B7A-5F29ABBF8357}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,7 +194,6 @@ Global
 		{1E224B9B-4726-48C8-84A1-6D3DBA33198A} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
 		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
 		{DF0F19B9-B25E-4D5B-A248-80CA246D43A1} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
-		{0CE6E86D-45F4-4454-8B7A-5F29ABBF8357} = {DF0F19B9-B25E-4D5B-A248-80CA246D43A1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75DFAC68-4D3A-46B6-8147-7B4FD62A3822}
