@@ -76,6 +76,7 @@ namespace Lotus.Serialization
 
         private void BuildDocTree(Type nodeType, Object nodeValue, Stack<XElement> stack)
         {
+            //序列化当前对象
             var insCusAttr = nodeType.GetCustomAttribute<XElementAttribute>(false);
             if (insCusAttr != null)
             {
@@ -83,64 +84,77 @@ namespace Lotus.Serialization
                 stack.Push(xel);
             }
 
+            //获取当前对象的属性列表
             var insProperties = nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.DeclaredOnly);
-            if (insProperties != null && insProperties.Length > 0)
+            if (insProperties == null || insProperties.Length == 0)
             {
-                var parentEl = stack.Count > 0 ? stack.Peek() : null;
-                foreach (var insProp in insProperties)
+                return;
+            }
+
+            //取元素栈中的最近一个元素作为当前对象的父元素
+            var parentEl = stack.Count > 0 ? stack.Peek() : null;
+
+            foreach (var insProp in insProperties)
+            {
+                Object propertyValue = insProp.XGetValue(nodeValue);
+
+                var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
+                if (insPropXElAttr != null)
                 {
-                    var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
-                    if (insPropXElAttr != null)
+                    var hasChildrenProperties = (from p in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                                 where p.GetCustomAttribute<XElementAttribute>() != null
+                                                 || p.GetCustomAttribute<XCollectionAttribute>() != null
+                                                 select p).Count() > 0;
+
+                    //如果当前属性没有子属性，则直接将属性值赋值给当前属性
+                    //然后将当前属性对应的元素添加到父元素
+                    if (!hasChildrenProperties)
                     {
                         var insPropEl = CreateXElement(insPropXElAttr, parentEl);
+                        insPropEl.Value = propertyValue.ToString();
 
-                        Object propertyValue = insProp.XGetValue(nodeValue);
-
-                        var childrenProperties = (from p in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                                  where p.GetCustomAttribute<XElementAttribute>() != null
-                                                  || p.GetCustomAttribute<XCollectionAttribute>() != null
-                                                  select p).ToArray();
-
-                        if (childrenProperties.Length == 0)
+                        if (parentEl != null)
                         {
-                            insPropEl.Value = propertyValue.ToString();
-
-                            if (parentEl != null)
-                            {
-                                parentEl.Add(insPropEl);
-                            }
-                        }
-                        else
-                        {
-
+                            parentEl.Add(insPropEl);
                         }
                     }
+                    else
+                    {
+                        //如果当前属性有子属性，则递归构建子属性的结构
+                        BuildDocTree(insProp.PropertyType, propertyValue, stack);
+                    }
 
-                    ////序列化集合
-                    //var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
-                    //if (insPropXCoAttr != null)
-                    //{
-                    //    var collection = propertyValue as IEnumerable;
-                    //    var newStack = new Stack<XElement>();
+                    //如果当前属性不是集合，则短路下面的操作
+                    continue;
+                }
 
-                    //    if (parentEl != null)
-                    //    {
-                    //        newStack.Push(parentEl);
-                    //    }
+                //如果父元素是集合
+                var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
+                if (insPropXCoAttr != null)
+                {
+                    var collection = propertyValue as IEnumerable;
+                    if (collection != null)
+                    {
+                        var itemStack = new Stack<XElement>();
 
-                    //    foreach (var item in collection)
-                    //    {
-                    //        BuildDocTree(item.GetType(), item, newStack);
-                    //    }
+                        //这个地方添加一个parentEl是为了在遍历子元素时
+                        //让子元素获取到父元素的命名空间
+                        itemStack.Push(parentEl);
 
-                    //    if (newStack.Count > 0 && parentEl != null)
-                    //    {
-                    //        while (newStack.Count > 0)
-                    //        {
-                    //            parentEl.Add(newStack.Pop());
-                    //        }
-                    //    }
-                    //}
+                        foreach (var item in collection)
+                        {
+                            BuildDocTree(item.GetType(), item, itemStack);
+                        }
+
+                        //这个地方要排除上面添加的parentEL
+                        //只添加集合中的子元素
+                        while (itemStack.Count > 1)
+                        {
+                            parentEl.Add(itemStack.Pop());
+                        }
+
+                        itemStack.Clear();
+                    }
                 }
             }
         }
