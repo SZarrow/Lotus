@@ -96,6 +96,11 @@ namespace Lotus.Serialization
 
             foreach (var insProp in insProperties)
             {
+                if (nodeValue == null)
+                {
+                    continue;
+                }
+
                 Object propertyValue = insProp.XGetValue(nodeValue);
 
                 var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
