@@ -232,5 +232,69 @@ namespace Lotus.Payment.Bill99
                 return new XResult<AgreementPayResponse>(null, ex);
             }
         }
+
+        /// <summary>
+        /// 查询交易流水
+        /// </summary>
+        /// <param name="requestUrl">请求地址</param>
+        /// <param name="request">请求内容</param>
+        public XResult<AgreementQueryResponse> AgreementQuery(String requestUrl, AgreementQueryRequest request)
+        {
+            if (String.IsNullOrWhiteSpace(requestUrl))
+            {
+                return new XResult<AgreementQueryResponse>(null, new ArgumentNullException(nameof(requestUrl)));
+            }
+
+            if (request == null)
+            {
+                return new XResult<AgreementQueryResponse>(null, new ArgumentNullException(nameof(request)));
+            }
+
+            String xml = _serializer.Serialize(request, doc =>
+            {
+                var qryTxnMsgContentEl = doc.Root.Element(XName.Get("QryTxnMsgContent", doc.Root.Name.NamespaceName));
+                if (qryTxnMsgContentEl != null)
+                {
+                    //var terminalIdEl = new XElement("terminalId", this.TerminalId);
+                    //if (!String.IsNullOrWhiteSpace(qryTxnMsgContentEl.Name.NamespaceName))
+                    //{
+                    //    terminalIdEl.Name = XName.Get(terminalIdEl.Name.LocalName, qryTxnMsgContentEl.Name.NamespaceName);
+                    //}
+                    //qryTxnMsgContentEl.AddFirst(terminalIdEl);
+
+                    var merchantIdEl = new XElement("merchantId", this.MerchantId);
+                    if (!String.IsNullOrWhiteSpace(qryTxnMsgContentEl.Name.NamespaceName))
+                    {
+                        merchantIdEl.Name = XName.Get(merchantIdEl.Name.LocalName, qryTxnMsgContentEl.Name.NamespaceName);
+                    }
+                    qryTxnMsgContentEl.AddFirst(merchantIdEl);
+                }
+            });
+
+            XResult<AgreementQueryResponse> result = null;
+
+            var task = _httpX.PostXmlAsync<AgreementQueryResponse>(requestUrl, xml).ContinueWith(t0 =>
+            {
+                if (t0.IsCompleted)
+                {
+                    if (t0.IsCanceled || t0.IsFaulted)
+                    {
+                        throw new TaskCanceledException($"RequestUrl:{requestUrl},Content:{xml}");
+                    }
+
+                    result = t0.Result;
+                }
+            });
+
+            try
+            {
+                task.Wait();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new XResult<AgreementQueryResponse>(null, ex);
+            }
+        }
     }
 }

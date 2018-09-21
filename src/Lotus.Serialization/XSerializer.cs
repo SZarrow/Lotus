@@ -116,7 +116,7 @@ namespace Lotus.Serialization
                     if (!hasChildrenProperties)
                     {
                         var insPropEl = CreateXElement(insPropXElAttr, parentEl);
-                        insPropEl.Value = propertyValue.ToString();
+                        insPropEl.Value = (propertyValue ?? String.Empty).ToString();
 
                         if (parentEl != null)
                         {
