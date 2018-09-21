@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -52,12 +53,55 @@ namespace Lotus.Payment.Bill99.Tests
                     ExternalRefNumber = "ERF0001",
                     Pan = "6217002000038983690",
                     PhoneNO = "13382185203",
-                    Token = "9001231671",
-                    ValidCode = "159112"
+                    Token = "9001253971",
+                    ValidCode = "326342"
                 }
             });
 
             WriteLog("TestAgreementBind()返回：" + JsonConvert.SerializeObject(result.Value));
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.Value);
+        }
+
+        [Fact]
+        public void TestAgreementPay()
+        {
+            var extDates = new List<ExtDate>(2);
+            extDates.Add(new ExtDate()
+            {
+                Key = "phone",
+                Value = "13382185203"
+            });
+            extDates.Add(new ExtDate()
+            {
+                Key = "validCode",
+                Value = "326342"
+            });
+
+            var api = CreateAgreementPaymentApi();
+            var result = api.AgreementPay("https://sandbox.99bill.com:9445/cnp/purchase", new AgreementPayRequest()
+            {
+                Version = "1.0",
+                TxnMsgContent = new TxnMsgRequestContent()
+                {
+                    Amount = "0.01",
+                    CustomerId = "C0001",
+                    EntryTime = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                    ExternalRefNumber = "ERF0001",
+                    InteractiveStatus = "TR1",
+                    NotifyUrl = "http://www.baidu.com",
+                    PayToken = "8120000000000567527",
+                    SpFlag = "QPay02",
+                    TxnType = "PUR",
+                    ExtMap = new ExtMap()
+                    {
+                        ExtDates = extDates
+                    }
+                }
+            });
+
+            WriteLog("TestAgreementPay()返回：" + JsonConvert.SerializeObject(result.Value));
 
             Assert.True(result.Success);
             Assert.NotNull(result.Value);
