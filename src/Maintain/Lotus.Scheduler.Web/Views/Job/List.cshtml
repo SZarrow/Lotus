@@ -1,0 +1,45 @@
+﻿@model IEnumerable<JobListItem>
+@{Layout = null;}
+<table>
+    <thead>
+        <tr>
+            <td>任务名称</td>
+            <td width="100px">版本</td>
+            <td>任务描述</td>
+            <td width="100px">任务状态</td>
+            <td width="150px">更新时间</td>
+            <td width="100px">操作</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td style="text-align:left;">@item.JobName</td>
+                <td>@item.Version</td>
+                <td>@item.JobDescription</td>
+                <td>
+                    @switch (item.JobStatus) {
+                            case JobStatus.None:
+                            <span>未调度</span>
+                                break;
+
+                            case JobStatus.Running:
+                            <span style="color:#00cc33;">@(item.JobStatus)</span>
+                                break;
+
+                            case JobStatus.Stoped:
+                            <span style="color:red;">@(item.JobStatus)</span>
+                                break;
+
+                            case JobStatus.Recovering:
+                            <span style="color:yellow;">@(item.JobStatus)</span>
+                            break;
+                        }
+                </td>
+                <td>@item.UpdateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>

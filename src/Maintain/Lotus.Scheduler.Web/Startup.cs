@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Lotus.Scheduler.Web.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +47,6 @@ namespace Lotus.Scheduler.Web
             }
 
             app.UseStaticFiles();
-            app.UseCookiePolicy();
 
             app.UseMvc(routes =>
             {
@@ -53,6 +54,16 @@ namespace Lotus.Scheduler.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            Init();
+        }
+
+        private void Init()
+        {
+            if (!Directory.Exists(JobConfig.JobsDir))
+            {
+                Directory.CreateDirectory(JobConfig.JobsDir);
+            }
         }
     }
 }

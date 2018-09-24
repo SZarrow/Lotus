@@ -63,7 +63,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Serialization.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Maintain", "Maintain", "{A524ECC3-BD60-4D02-8226-86D618C940C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lotus.Scheduler.Web", "src\Maintain\Lotus.Scheduler.Web\Lotus.Scheduler.Web.csproj", "{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Scheduler.Web", "src\Maintain\Lotus.Scheduler.Web\Lotus.Scheduler.Web.csproj", "{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
