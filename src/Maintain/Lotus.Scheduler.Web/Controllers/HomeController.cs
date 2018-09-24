@@ -5,32 +5,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Lotus.Scheduler.Web.Models;
+using Lotus.Scheduler.Web.Services;
 
 namespace Lotus.Scheduler.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private ScheduleService _service = new ScheduleService();
+
         public IActionResult Index()
         {
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
+            ViewData["JobList"] = _service.GetJobListItems(1, 10);
             return View();
         }
 

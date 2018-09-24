@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Lotus.Scheduler.Web.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +22,6 @@ namespace Lotus.Scheduler.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
@@ -34,7 +35,6 @@ namespace Lotus.Scheduler.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -47,7 +47,6 @@ namespace Lotus.Scheduler.Web
             }
 
             app.UseStaticFiles();
-            app.UseCookiePolicy();
 
             app.UseMvc(routes =>
             {
@@ -55,6 +54,16 @@ namespace Lotus.Scheduler.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            Init();
+        }
+
+        private void Init()
+        {
+            if (!Directory.Exists(JobConfig.JobsDir))
+            {
+                Directory.CreateDirectory(JobConfig.JobsDir);
+            }
         }
     }
 }
