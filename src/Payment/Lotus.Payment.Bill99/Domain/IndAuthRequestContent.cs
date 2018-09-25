@@ -21,6 +21,18 @@ namespace Lotus.Payment.Bill99.Domain
         public String ExternalRefNumber { get; set; }
 
         /// <summary>
+        /// 姓名
+        /// </summary>
+        [XElement("cardHolderName")]
+        public String CardHolderName { get; set; }
+
+        /// <summary>
+        /// 身份证号
+        /// </summary>
+        [XElement("cardHolderId")]
+        public String CardHolderId { get; set; }
+
+        /// <summary>
         /// 银行卡号
         /// </summary>
         [XElement("pan")]

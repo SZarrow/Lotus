@@ -10,7 +10,7 @@ namespace Lotus.Payment.Bill99.Domain
         [XElement("ErrorMsgContent")]
         public ErrorMsgContent ErrorMsgContent { get; set; }
 
-        [XElement("QryTxnMsgContent")]
+        [XElement("TxnMsgContent")]
         public QryTxnMsgResponseContent QryTxnMsgContent { get; set; }
     }
 }
