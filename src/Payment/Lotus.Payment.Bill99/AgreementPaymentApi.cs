@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
@@ -86,6 +87,8 @@ namespace Lotus.Payment.Bill99
                 }
             });
 
+            WriteLog("AgreementApplyRequestData：" + xml);
+
             XResult<AgreementApplyResponse> result = null;
 
             var task = _httpX.PostXmlAsync<AgreementApplyResponse>(requestUrl, xml).ContinueWith(t0 =>
@@ -142,6 +145,8 @@ namespace Lotus.Payment.Bill99
                     indAuthDynVerifyContentEl.AddFirst(merchantIdEl);
                 }
             });
+
+            WriteLog("AgreementVerifyRequestData：" + xml);
 
             XResult<AgreementBindResponse> result = null;
 
@@ -207,6 +212,8 @@ namespace Lotus.Payment.Bill99
                 }
             });
 
+            WriteLog("AgreementPayRequestData：" + xml);
+
             XResult<AgreementPayResponse> result = null;
 
             var task = _httpX.PostXmlAsync<AgreementPayResponse>(requestUrl, xml).ContinueWith(t0 =>
@@ -255,12 +262,12 @@ namespace Lotus.Payment.Bill99
                 var qryTxnMsgContentEl = doc.Root.Element(XName.Get("QryTxnMsgContent", doc.Root.Name.NamespaceName));
                 if (qryTxnMsgContentEl != null)
                 {
-                    //var terminalIdEl = new XElement("terminalId", this.TerminalId);
-                    //if (!String.IsNullOrWhiteSpace(qryTxnMsgContentEl.Name.NamespaceName))
-                    //{
-                    //    terminalIdEl.Name = XName.Get(terminalIdEl.Name.LocalName, qryTxnMsgContentEl.Name.NamespaceName);
-                    //}
-                    //qryTxnMsgContentEl.AddFirst(terminalIdEl);
+                    var terminalIdEl = new XElement("terminalId", this.TerminalId);
+                    if (!String.IsNullOrWhiteSpace(qryTxnMsgContentEl.Name.NamespaceName))
+                    {
+                        terminalIdEl.Name = XName.Get(terminalIdEl.Name.LocalName, qryTxnMsgContentEl.Name.NamespaceName);
+                    }
+                    qryTxnMsgContentEl.AddFirst(terminalIdEl);
 
                     var merchantIdEl = new XElement("merchantId", this.MerchantId);
                     if (!String.IsNullOrWhiteSpace(qryTxnMsgContentEl.Name.NamespaceName))
@@ -295,6 +302,12 @@ namespace Lotus.Payment.Bill99
             {
                 return new XResult<AgreementQueryResponse>(null, ex);
             }
+        }
+
+        private void WriteLog(String content)
+        {
+            String logFile = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"log\{DateTime.Now.ToString("yyyy-MM-dd")}.txt");
+            File.AppendAllText(logFile, Environment.NewLine + Environment.NewLine + content);
         }
     }
 }

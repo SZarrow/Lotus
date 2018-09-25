@@ -10,8 +10,6 @@ namespace Lotus.Payment.Bill99.Domain
     {
         [XElement("externalRefNumber")]
         public String ExternalRefNumber { get; set; }
-        [XElement("refNumber")]
-        public String RefNumber { get; set; }
         [XElement("txnType")]
         public String TxnType { get; set; }
     }

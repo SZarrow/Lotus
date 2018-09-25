@@ -16,11 +16,21 @@ namespace Lotus.Payment.Bill99.Tests
 {
     public class AgreementPaymentApiTest
     {
+        private const Boolean IsTest = false;
+
         [Fact]
         public void TestAgreementApply()
         {
             var api = CreateAgreementPaymentApi();
-            var result = api.AgreementApply("https://sandbox.99bill.com:9445/cnp/ind_auth", new AgreementApplyRequest()
+
+            String url = "https://sandbox.99bill.com:9445/cnp/ind_auth";
+
+            if (!IsTest)
+            {
+                url = "https://mas.99bill.com/cnp/ind_auth";
+            }
+
+            var result = api.AgreementApply(url, new AgreementApplyRequest()
             {
                 Version = "1.0",
                 IndAuthContent = new IndAuthRequestContent()
@@ -29,6 +39,8 @@ namespace Lotus.Payment.Bill99.Tests
                     CustomerId = "C0001",
                     ExternalRefNumber = "ERF0001",
                     Pan = "6217002000038983690",
+                    CardHolderName = "范波",
+                    CardHolderId = "320503199107041753",
                     PhoneNO = "13382185203"
                 }
             });
@@ -43,7 +55,15 @@ namespace Lotus.Payment.Bill99.Tests
         public void TestAgreementBind()
         {
             var api = CreateAgreementPaymentApi();
-            var result = api.AgreementVerify("https://sandbox.99bill.com:9445/cnp/ind_auth_verify", new AgreementBindRequest()
+
+            String url = "https://sandbox.99bill.com:9445/cnp/ind_auth_verify";
+
+            if (!IsTest)
+            {
+                url = "https://mas.99bill.com/cnp/ind_auth_verify";
+            }
+
+            var result = api.AgreementVerify(url, new AgreementBindRequest()
             {
                 Version = "1.0",
                 IndAuthDynVerifyContent = new IndAuthDynVerifyRequestContent()
@@ -53,8 +73,8 @@ namespace Lotus.Payment.Bill99.Tests
                     ExternalRefNumber = "ERF0001",
                     Pan = "6217002000038983690",
                     PhoneNO = "13382185203",
-                    Token = "9001253971",
-                    ValidCode = "326342"
+                    Token = "9001262281",
+                    ValidCode = "526702"
                 }
             });
 
@@ -76,11 +96,19 @@ namespace Lotus.Payment.Bill99.Tests
             extDates.Add(new ExtDate()
             {
                 Key = "validCode",
-                Value = "326342"
+                Value = "526702"
             });
 
             var api = CreateAgreementPaymentApi();
-            var result = api.AgreementPay("https://sandbox.99bill.com:9445/cnp/purchase", new AgreementPayRequest()
+
+            String url = "https://sandbox.99bill.com:9445/cnp/purchase";
+
+            if (!IsTest)
+            {
+                url = "https://mas.99bill.com/cnp/purchase";
+            }
+
+            var result = api.AgreementPay(url, new AgreementPayRequest()
             {
                 Version = "1.0",
                 TxnMsgContent = new TxnMsgRequestContent()
@@ -111,7 +139,15 @@ namespace Lotus.Payment.Bill99.Tests
         public void TestAgreementQuery()
         {
             var api = CreateAgreementPaymentApi();
-            var result = api.AgreementQuery("https://sandbox.99bill.com:9445/cnp/query_txn", new AgreementQueryRequest()
+
+            String url = "https://sandbox.99bill.com:9445/cnp/query_txn";
+
+            if (!IsTest)
+            {
+                url = "https://mas.99bill.com/cnp/query_txn";
+            }
+
+            var result = api.AgreementQuery(url, new AgreementQueryRequest()
             {
                 Version = "1.0",
                 QryTxnMsgContent = new QryTxnMsgRequestContent()
@@ -136,7 +172,7 @@ namespace Lotus.Payment.Bill99.Tests
         private AgreementPaymentApi CreateAgreementPaymentApi()
         {
             var handler = new HttpClientHandler();
-            using (var fs = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "10411004511201290.pfx")))
+            using (var fs = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "812310060510214.pfx")))
             {
                 Byte[] certData = new Byte[fs.Length];
                 fs.Read(certData, 0, certData.Length);
@@ -147,9 +183,9 @@ namespace Lotus.Payment.Bill99.Tests
 
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
 
-            String auth = Convert.ToBase64String(Encoding.ASCII.GetBytes("104110045112012:vpos123"));
+            String auth = Convert.ToBase64String(Encoding.ASCII.GetBytes("812310060510212:vpos123"));
             client.DefaultRequestHeaders.Add("Authorization", $"Basic {auth}");
-            return new AgreementPaymentApi(client, "104110045112012", "00002012");
+            return new AgreementPaymentApi(client, "812310060510212", "13196988");
         }
 
         private void WriteLog(String content)
