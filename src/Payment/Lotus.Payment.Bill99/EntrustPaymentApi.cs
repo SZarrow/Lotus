@@ -21,7 +21,7 @@ namespace Lotus.Payment.Bill99
         private String _publicKeyFilePath;
 
         /// <summary>
-        /// 
+        /// 初始化EntrustPaymentApi类的实例
         /// </summary>
         /// <param name="membercode">商户在快钱的会员编号</param>
         /// <param name="merchantAcctId">商户在快钱的收款结算账号</param>
@@ -97,7 +97,6 @@ namespace Lotus.Payment.Bill99
             DateTime now = DateTime.Now;
 
             //提交数据xml报文
-            #region   selDataXml
             StringBuilder sb = new StringBuilder();
             sb.Append("<tns:merchant-debit-request xmlns:ns0=\"http://www.99bill.com/schema/ddp/product/head\" xmlns:ns1=\"http://www.99bill.com/schema/ddp/product/pki\" xmlns:ns2=\"http://www.99bill.com/schema/commons\" xmlns:tns=\"http://www.99bill.com/schema/ddp/product\">");
             sb.Append("<tns:inputCharset>1</tns:inputCharset>");
@@ -111,30 +110,18 @@ namespace Lotus.Payment.Bill99
             sb.Append($"<tns:amountTotal>{totalAmount}</tns:amountTotal>");
             sb.Append("<tns:ext1/>");
             sb.Append("<tns:ext2/>");
-            //sb.Append("<tns:items>");
-            //sb.Append("<tns:seqId>" + now.ToString("yyyyMMddHHmmss") + "</tns:seqId>");
-            //sb.Append("<tns:usage>电费</tns:usage>");
-            //sb.Append("<tns:bankId>BCOM</tns:bankId>");
-            //sb.Append("<tns:accType>0201</tns:accType>");
-            //sb.Append("<tns:openAccDept>交行</tns:openAccDept>");
-            //sb.Append("<tns:bankAcctName>测试</tns:bankAcctName>");
-            //sb.Append("<tns:bankAcctId>6222600210011817312</tns:bankAcctId>");
-            //sb.Append("<tns:expiredDate>1011</tns:expiredDate>");
-            //sb.Append("<tns:idType>101</tns:idType>");
-            //sb.Append("<tns:idCode>210124198508162281</tns:idCode>");
-            //sb.Append("<tns:amount>20</tns:amount>");
-            //sb.Append("<tns:curType>CNY</tns:curType>");
-            //sb.Append("<tns:note>note</tns:note>");
-            //sb.Append("<tns:remark>REMARK</tns:remark>");
-            //sb.Append("<tns:mobile>15094305959</tns:mobile>");
-            //sb.Append(" </tns:items>");
+
+            foreach (var payAccount in accounts)
+            {
+                sb.Append(payAccount.ToString());
+            }
+
             sb.Append("</tns:merchant-debit-request>");
-            #endregion
 
             //string prikey_path = HttpContext.Current.Server.MapPath("") + "\\certificate\\" + "tester-rsa.pfx";//商户私钥证书路径
             //string pubkey_path = HttpContext.Current.Server.MapPath("") + "\\certificate\\" + "99bill.cert.rsa.20340630_sandbox.cer";//快钱公钥证书路径
-            string priPW = "123456";
-            string pubPW = "";//快钱公钥密码
+            String priPW = "123456";
+            String pubPW = String.Empty;//快钱公钥密码
 
             //获取随机KEY
             Byte[] enKey = bigpay.randomKey(2);
@@ -154,8 +141,8 @@ namespace Lotus.Payment.Bill99
             sealDataType sealData = new sealDataType
             {
                 digitalenvelope = bigpay.CodingToString(zipdigData, 1),//数字信封
-                encrypteddata = bigpay.CodingToString(ziptoEnData, 1),//加密数据 
-                originaldata = "",//xml文
+                encrypteddata = bigpay.CodingToString(ziptoEnData, 1),//加密数据
+                originaldata = String.Empty,//xml文
                 signeddata = bigpay.CodingToString(zipSigData, 1)//签名数据
             };
 
@@ -201,17 +188,17 @@ namespace Lotus.Payment.Bill99
             Byte[] bytebackkey = null;//返回的对称算法密钥
             try
             {
-                if (backsignedXmldata != "")
+                if (!String.IsNullOrWhiteSpace(backsignedXmldata))
                 {
                     bytesigndata = bigpay.CodingToByte(backsignedXmldata, 1);//将获取的string签名转成byte
                 }
 
-                if (backdigitalenvelopeXmldata != "")
+                if (!String.IsNullOrWhiteSpace(backdigitalenvelopeXmldata))
                 {
                     bytebackkey = bigpay.CerRSADecrypt(bigpay.CodingToByte(backdigitalenvelopeXmldata, 1), _privateKeyFilePath, priPW);
                 }
 
-                if (backencryptedXmldata != "")
+                if (!String.IsNullOrWhiteSpace(backencryptedXmldata))
                 {
                     byteorgdata = bigpay.SymmetryDecryptType(bigpay.CodingToByte(backencryptedXmldata, 1), bytebackkey, 1);
                 }
