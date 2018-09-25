@@ -22,7 +22,7 @@ namespace Lotus.Payment.Bill99.Domain
         /// <summary>
         /// 银行代码
         /// </summary>
-        public BankId BankId { get; set; }
+        public String BankId { get; set; }
         /// <summary>
         /// 付款账户类型
         /// </summary>
@@ -59,7 +59,7 @@ namespace Lotus.Payment.Bill99.Domain
             sb.Append("<tns:seqId>" + now.ToString("yyyyMMddHHmmss") + "</tns:seqId>");
             sb.Append($"<tns:usage>{this.Usage}</tns:usage>");
             sb.Append($"<tns:bankId>{this.BankId}</tns:bankId>");
-            sb.Append($"<tns:accType>{this.AccountType.GetValue<String>()}</tns:accType>");
+            sb.Append($"<tns:accType>{this.AccountType.GetValue()}</tns:accType>");
             sb.Append($"<tns:bankAcctName>{this.BankAcctName}</tns:bankAcctName>");
             sb.Append($"<tns:bankAcctId>{this.BankAcctId}</tns:bankAcctId>");
             sb.Append("<tns:idType>101</tns:idType>");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Lotus.Core.Extensions
@@ -15,13 +16,26 @@ namespace Lotus.Core.Extensions
 
             var field = obj.GetType().GetField(obj.ToString());
             var cusAttr = field.GetCustomAttribute<EnumValueAttribute>();
-            if (cusAttr != null && cusAttr.Value is T)
+            if (cusAttr != null)
             {
-                return (T)cusAttr.Value;
+                if (cusAttr.Value is T)
+                {
+                    return (T)cusAttr.Value;
+                }
+
+                if (typeof(T) == typeof(String))
+                {
+                    Object value = cusAttr.Value != null ? cusAttr.Value.ToString() : obj.ToString();
+                    return (T)value;
+                }
             }
 
             return default(T);
-            throw new NotImplementedException();
+        }
+
+        public static String GetValue(this Enum obj)
+        {
+            return GetValue<String>(obj);
         }
     }
 }
