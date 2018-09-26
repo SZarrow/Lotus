@@ -5,9 +5,9 @@ using Lotus.Serialization;
 
 namespace Lotus.Payment.Bill99.Domain
 {
-    public class EntrustPayResponse:MasMessage
+    public class EntrustPayRequest : MasMessage
     {
         [XElement("TxnMsgContent")]
-        public EntrustPayResponseContent EntrustPayResponseContent { get; set; }
+        public EntrustPayRequestContent EntrustPayRequestContent { get; set; }
     }
 }
