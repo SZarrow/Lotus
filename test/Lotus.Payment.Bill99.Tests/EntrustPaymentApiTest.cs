@@ -24,7 +24,7 @@ namespace Lotus.Payment.Bill99.Tests
 
             var extDates = new ExtDate[] { new ExtDate() { Key = "phone", Value = "13382185203" } };
 
-            var result = api.Pay(url, new EntrustPayRequest()
+            var result = api.EntrustPay(url, new EntrustPayRequest()
             {
                 Version = "1.0",
                 EntrustPayRequestContent = new EntrustPayRequestContent()
@@ -51,6 +51,29 @@ namespace Lotus.Payment.Bill99.Tests
             WriteLog("TestEntrustPay()返回：" + JsonConvert.SerializeObject(result.Value));
         }
 
+        [Fact]
+        public void TestEntrustQuery()
+        {
+            var api = CreateEntrustPaymentApi();
+
+            String url = "https://sandbox.99bill.com:9445/cnp/query_txn";
+            url = "https://mas.99bill.com/cnp/query_txn";
+
+            var result = api.EntrustQuery(url, new EntrustQueryRequest()
+            {
+                Version = "1.0",
+                EntrustQueryRequestContent = new EntrustQueryRequestContent()
+                {
+                    ExternalRefNumber = "ERF0001",
+                    TxnType = "PUR"
+                }
+            });
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.Value);
+
+            WriteLog("TestEntrustQuery()返回：" + JsonConvert.SerializeObject(result.Value));
+        }
 
         private EntrustPaymentApi CreateEntrustPaymentApi()
         {
