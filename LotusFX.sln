@@ -63,6 +63,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Maintain", "Maintain", "{A5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Scheduler.Web", "src\Maintain\Lotus.Scheduler.Web\Lotus.Scheduler.Web.csproj", "{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lotus.Payment.Bill99.Tests", "test\Lotus.Payment.Bill99.Tests\Lotus.Payment.Bill99.Tests.csproj", "{846798E9-2C44-4654-9532-8D23608B0C1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,10 @@ Global
 		{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{846798E9-2C44-4654-9532-8D23608B0C1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{846798E9-2C44-4654-9532-8D23608B0C1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{846798E9-2C44-4654-9532-8D23608B0C1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{846798E9-2C44-4654-9532-8D23608B0C1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,6 +200,7 @@ Global
 		{845CA0E1-DEA5-4B38-A2C8-68CD60D6A902} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
 		{A524ECC3-BD60-4D02-8226-86D618C940C5} = {C2DEE63C-1744-4741-8792-3C05C864D88C}
 		{8C3FEF5A-E07F-4242-964E-C36C1AE9E68E} = {A524ECC3-BD60-4D02-8226-86D618C940C5}
+		{846798E9-2C44-4654-9532-8D23608B0C1B} = {0EAB1398-FF84-43CD-9D50-D4A07C0C513F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75DFAC68-4D3A-46B6-8147-7B4FD62A3822}
