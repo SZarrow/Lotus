@@ -15,48 +15,20 @@ namespace Lotus.Scheduler.Web.Services
     public class ScheduleService
     {
         private readonly static StdSchedulerFactory s_scheduleFactory;
+        private readonly static Dictionary<String, JobItem> s_jobDic;
 
         static ScheduleService()
         {
             s_scheduleFactory = new StdSchedulerFactory(new NameValueCollection() {
                 { "quartz.serializer.type", "binary"}
             });
+
+            s_jobDic = new Dictionary<String, JobItem>();
         }
 
-        public IEnumerable<JobListItem> GetJobListItems(Int32 pageIndex, Int32 pageSize, String keyword = null)
+        public IEnumerable<JobItem> GetRunningJobs()
         {
-            List<JobListItem> items = new List<JobListItem>(20);
-
-            var runningJobs = GetRunningJobs();
-
-            var jobDirs = Directory.EnumerateDirectories(JobConfig.JobsDir);
-            foreach (var jobDir in jobDirs)
-            {
-                var dirInfo = new DirectoryInfo(jobDir);
-                var kv = GetJobNameAndVersion(dirInfo.Name);
-
-                var item = new JobListItem()
-                {
-                    JobName = kv.Key,
-                    Version = kv.Value,
-                    UpdateTime = dirInfo.LastWriteTime
-                };
-
-                var jobIsRunning = runningJobs.Count(x => x.JobName == item.JobName && x.Group == item.Group) > 0;
-                if (jobIsRunning)
-                {
-                    item.JobStatus = JobStatus.Running;
-                }
-
-                items.Add(item);
-            }
-
-            return items;
-        }
-
-        public IEnumerable<JobListItem> GetRunningJobs()
-        {
-            var runningJobs = new List<JobListItem>(20);
+            var runningJobs = new List<JobItem>(20);
 
             var schedulers = s_scheduleFactory.GetAllSchedulers().GetAwaiter().GetResult();
             if (schedulers != null)
@@ -64,21 +36,20 @@ namespace Lotus.Scheduler.Web.Services
                 foreach (var sche in schedulers)
                 {
                     var jobs = sche.GetCurrentlyExecutingJobs().GetAwaiter().GetResult();
-                    if (jobs != null)
+                    if (jobs == null) { continue; }
+
+                    foreach (var job in jobs)
                     {
-                        foreach (var job in jobs)
+                        var triggerState = sche.GetTriggerState(job.Trigger.Key).GetAwaiter().GetResult();
+                        var kv = GetJobNameAndVersion(job.JobDetail.Key.Name);
+                        runningJobs.Add(new JobItem()
                         {
-                            var triggerState = sche.GetTriggerState(job.Trigger.Key).GetAwaiter().GetResult();
-                            var kv = GetJobNameAndVersion(job.JobDetail.Key.Name);
-                            runningJobs.Add(new JobListItem()
-                            {
-                                JobStatus = GetJobStatus(triggerState),
-                                JobName = kv.Key,
-                                Group = job.JobDetail.Key.Group,
-                                Version = kv.Value,
-                                 JobDescription = job.JobDetail.Description
-                            });
-                        }
+                            JobStatus = GetJobStatus(triggerState),
+                            JobName = kv.Key,
+                            Group = job.JobDetail.Key.Group,
+                            Version = kv.Value,
+                            JobDescription = job.JobDetail.Description
+                        });
                     }
                 }
             }
@@ -112,6 +83,31 @@ namespace Lotus.Scheduler.Web.Services
             }
 
             return JobStatus.None;
+        }
+
+        private void LoadJobs()
+        {
+            var jobDirs = Directory.EnumerateDirectories(JobConfig.JobsDir);
+            foreach (var jobDir in jobDirs)
+            {
+                var dirInfo = new DirectoryInfo(jobDir);
+                var nv = GetJobNameAndVersion(dirInfo.Name);
+
+                var jobItem = new JobItem()
+                {
+                    JobName = nv.Key,
+                    Version = nv.Value,
+                    UpdateTime = dirInfo.LastWriteTime
+                };
+
+                //var jobIsRunning = runningJobs.Count(x => x.JobName == item.JobName && x.Group == item.Group) > 0;
+                //if (jobIsRunning)
+                //{
+                //    item.JobStatus = JobStatus.Running;
+                //}
+
+                s_jobDic[jobItem.JobId] = jobItem;
+            }
         }
     }
 }

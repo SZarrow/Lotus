@@ -5,8 +5,15 @@ using System.Threading.Tasks;
 
 namespace Lotus.Scheduler.Web.Models
 {
-    public class JobListItem
+    public class JobItem
     {
+        public String JobId
+        {
+            get
+            {
+                return $"{this.JobName}.{this.Version}";
+            }
+        }
         public String JobName { get; set; }
         public String Group { get; set; }
         public String JobDescription { get; set; }
