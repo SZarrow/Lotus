@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Quartz;
 
-namespace Lotus.Scheduler.Tests
+namespace Lotus.Schedule
 {
-    public class LocalJob : IJob
+    public class ApiJob : IJob
     {
         public Task Execute(IJobExecutionContext context)
         {
