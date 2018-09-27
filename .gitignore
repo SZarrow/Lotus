@@ -330,3 +330,4 @@ ASALocalRun/
 .mfractor/
 
 build/
+/test/Lotus.Payment.Bill99.Tests
