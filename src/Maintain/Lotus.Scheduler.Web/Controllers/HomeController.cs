@@ -15,7 +15,7 @@ namespace Lotus.Scheduler.Web.Controllers
 
         public IActionResult Index()
         {
-            ViewData["JobList"] = _service.GetJobListItems(1, 10);
+            //ViewData["JobList"] = _service.GetJobListItems(1, 10);
             return View();
         }
 

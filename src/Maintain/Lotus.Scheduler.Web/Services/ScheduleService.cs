@@ -109,5 +109,15 @@ namespace Lotus.Scheduler.Web.Services
                 s_jobDic[jobItem.JobId] = jobItem;
             }
         }
+
+        public void Start()
+        {
+
+        }
+
+        public void Shutdown()
+        {
+
+        }
     }
 }
