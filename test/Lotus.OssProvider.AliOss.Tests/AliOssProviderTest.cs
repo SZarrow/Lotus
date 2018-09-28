@@ -144,6 +144,23 @@ namespace Lotus.OssProvider.AliOss.Tests
         }
 
         [Fact]
+        public void TestDeleteObjectsByDirectory()
+        {
+            IOssProvider provider = new AliOssProvider();
+            var result = provider.DeleteObjects("sh-oss-1", "images/2018/");
+            if (result.Success)
+            {
+                Trace.WriteLine("删除成功。");
+            }
+            else
+            {
+                Trace.WriteLine($"删除失败，原因：{result.Exceptions[0].Message}");
+            }
+
+            Assert.True(result.Success);
+        }
+
+        [Fact]
         public void TestGetObject()
         {
             IOssProvider provider = new AliOssProvider();
