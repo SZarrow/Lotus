@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,7 +32,7 @@ namespace Lotus.Serialization
             while (typeStack.Count > 0)
             {
                 var type = typeStack.Pop();
-                BuildDocTree(value, eleStack, type);
+                BuildDocTree(type, value, eleStack);
             }
 
             XElement rootEl = null;
@@ -45,6 +47,10 @@ namespace Lotus.Serialization
                 {
                     rootEl = parentEl;
                     break;
+                }
+                else
+                {
+                    eleStack.Peek().Add(parentEl);
                 }
             }
 
@@ -68,77 +74,91 @@ namespace Lotus.Serialization
             }
         }
 
-        private void BuildDocTree(Object value, Stack<XElement> stack, Type instanceType)
+        private void BuildDocTree(Type nodeType, Object nodeValue, Stack<XElement> stack)
         {
-            var insCusAttr = instanceType.GetCustomAttribute<XElementAttribute>(false);
+            //序列化当前对象
+            var insCusAttr = nodeType.GetCustomAttribute<XElementAttribute>(false);
             if (insCusAttr != null)
             {
-                var xel = new XElement(insCusAttr.ElementName);
-
-                //如果当前节点自己有命名空间，则添加自己的命名空间
-                if (!String.IsNullOrWhiteSpace(insCusAttr.Namespace))
-                {
-                    xel.Name = XName.Get(insCusAttr.ElementName, insCusAttr.Namespace);
-                }
-                else
-                {
-                    //如果当前节点自己没有命名空间，但是父节点有命名空间，
-                    //则将使用父节点的命名作为自己的命名空间
-                    String parentNamespace = stack.Count > 0 ? stack.Peek().Name.NamespaceName : null;
-                    if (!String.IsNullOrWhiteSpace(parentNamespace))
-                    {
-                        xel.Name = XName.Get(insCusAttr.ElementName, parentNamespace);
-                    }
-                }
-
+                var xel = CreateXElement(insCusAttr, stack.Count > 0 ? stack.Peek() : null);
                 stack.Push(xel);
             }
 
-            var insProperties = instanceType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.DeclaredOnly);
-            if (insProperties != null && insProperties.Length > 0)
+            //获取当前对象的属性列表
+            var insProperties = nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.DeclaredOnly);
+            if (insProperties == null || insProperties.Length == 0)
             {
-                var parentEl = stack.Count > 0 ? stack.Peek() : null;
-                foreach (var insProp in insProperties)
+                return;
+            }
+
+            //取元素栈中的最近一个元素作为当前对象的父元素
+            var parentEl = stack.Count > 0 ? stack.Peek() : null;
+
+            foreach (var insProp in insProperties)
+            {
+                if (nodeValue == null)
                 {
-                    var insPropAttr = insProp.GetCustomAttribute<XElementAttribute>();
-                    if (insPropAttr != null)
+                    continue;
+                }
+
+                Object propertyValue = insProp.XGetValue(nodeValue);
+
+                var insPropXElAttr = insProp.GetCustomAttribute<XElementAttribute>();
+                if (insPropXElAttr != null)
+                {
+                    var hasChildrenProperties = (from p in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                                 where p.GetCustomAttribute<XElementAttribute>() != null
+                                                 || p.GetCustomAttribute<XCollectionAttribute>() != null
+                                                 select p).Count() > 0;
+
+                    //如果当前属性没有子属性，则直接将属性值赋值给当前属性
+                    //然后将当前属性对应的元素添加到父元素
+                    if (!hasChildrenProperties)
                     {
-                        var insPropEl = new XElement(insPropAttr.ElementName);
+                        var insPropEl = CreateXElement(insPropXElAttr, parentEl);
+                        insPropEl.Value = (propertyValue ?? String.Empty).ToString();
 
-                        if (!String.IsNullOrWhiteSpace(insPropAttr.Namespace))
-                        {
-                            insPropEl.Name = XName.Get(insPropAttr.ElementName, insPropAttr.Namespace);
-                        }
-                        else
-                        {
-                            String parentNamespace = stack.Count > 0 ? stack.Peek().Name.NamespaceName : null;
-                            if (!String.IsNullOrWhiteSpace(parentNamespace))
-                            {
-                                insPropEl.Name = XName.Get(insPropAttr.ElementName, parentNamespace);
-                            }
-                        }
-
-                        Object propertyValue = insProp.XGetValue(value);
-                        Boolean hasChildrenXElements = (from t0 in insProp.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                                        where t0.GetCustomAttribute<XElementAttribute>() != null
-                                                        select t0).Count() > 0;
-
-                        if (propertyValue != null)
-                        {
-                            if (hasChildrenXElements)
-                            {
-                                BuildDocTree(propertyValue, stack, insProp.PropertyType);
-                            }
-                            else
-                            {
-                                insPropEl.Value = propertyValue.ToString();
-                            }
-                        }
-
-                        if (parentEl != null && !hasChildrenXElements)
+                        if (parentEl != null)
                         {
                             parentEl.Add(insPropEl);
                         }
+                    }
+                    else
+                    {
+                        //如果当前属性有子属性，则递归构建子属性的结构
+                        BuildDocTree(insProp.PropertyType, propertyValue, stack);
+                    }
+
+                    //如果当前属性不是集合，则短路下面的操作
+                    continue;
+                }
+
+                //如果父元素是集合
+                var insPropXCoAttr = insProp.GetCustomAttribute<XCollectionAttribute>();
+                if (insPropXCoAttr != null)
+                {
+                    var collection = propertyValue as IEnumerable;
+                    if (collection != null)
+                    {
+                        var itemStack = new Stack<XElement>();
+
+                        //这个地方添加一个parentEl是为了在遍历子元素时
+                        //让子元素获取到父元素的命名空间
+                        itemStack.Push(parentEl);
+
+                        foreach (var item in collection)
+                        {
+                            BuildDocTree(item.GetType(), item, itemStack);
+                        }
+
+                        //这个地方要排除上面添加的parentEL
+                        //只添加集合中的子元素
+                        while (itemStack.Count > 1)
+                        {
+                            parentEl.Add(itemStack.Pop());
+                        }
+
+                        itemStack.Clear();
                     }
                 }
             }
@@ -184,24 +204,35 @@ namespace Lotus.Serialization
             return instance;
         }
 
-        private void Fill<T>(T value, XElement root)
+        private void Fill(Object value, XElement root)
         {
-            var valueType = typeof(T);
+            var valueType = value.GetType();
             var xelProperties = from p in valueType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                                 let xelAttr = p.GetCustomAttribute<XElementAttribute>()
-                                where xelAttr != null
-                                select new { XName = xelAttr.ElementName, Property = p };
+                                let xcoAttr = p.GetCustomAttribute<XCollectionAttribute>()
+                                where xelAttr != null || xcoAttr != null
+                                select new
+                                {
+                                    XElementAttribute = xelAttr,
+                                    XCollectionAttribute = xcoAttr,
+                                    PropertyInfo = p
+                                };
 
-            var xels = root.Elements();
-            foreach (var xel in xels)
+            foreach (var xelProp in xelProperties)
             {
-                var xelProp = xelProperties.FirstOrDefault(x => x.XName == xel.Name.LocalName);
-                if (xelProp != null)
+                if (xelProp.XElementAttribute != null)
                 {
-                    SetProperty(value, xelProp.Property, xel);
+                    var xel = root.Elements().FirstOrDefault(x => x.Name.LocalName == xelProp.XElementAttribute.ElementName);
+                    if (xel != null)
+                    {
+                        SetProperty(value, xelProp.PropertyInfo, xel);
+                    }
+                }
+                else if (xelProp.XCollectionAttribute != null)
+                {
+
                 }
             }
-
         }
 
         private void SetProperty(Object instance, PropertyInfo property, XElement xel)
@@ -211,15 +242,34 @@ namespace Lotus.Serialization
                 var newIns = Activator.CreateInstance(property.PropertyType);
                 var properties = from p in property.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
                                  let xelAttr = p.GetCustomAttribute<XElementAttribute>()
-                                 where xelAttr != null
-                                 select new { XName = xelAttr.ElementName, Property = p };
+                                 let xcoAttr = p.GetCustomAttribute<XCollectionAttribute>()
+                                 where xelAttr != null || xcoAttr != null
+                                 select new { ElementName = xelAttr != null ? xelAttr.ElementName : String.Empty, IsCollection = (xcoAttr != null), Property = p };
 
-                foreach (var xelChild in xel.Elements())
+                foreach (var childProp in properties)
                 {
-                    var insProp = properties.FirstOrDefault(x => x.XName == xelChild.Name.LocalName);
-                    if (insProp != null)
+                    if (childProp.IsCollection)
                     {
-                        SetProperty(newIns, insProp.Property, xelChild);
+                        var genericTypes = childProp.Property.PropertyType.GenericTypeArguments;
+                        var listType = typeof(List<>).MakeGenericType(genericTypes);
+                        var list = listType.GetConstructor(Type.EmptyTypes).XConstruct(null) as IList;
+
+                        foreach (var el in xel.Elements())
+                        {
+                            var listItem = Activator.CreateInstance(genericTypes[0]);
+                            Fill(listItem, el);
+                            list.Add(listItem);
+                        }
+
+                        childProp.Property.XSetValue(newIns, list);
+                    }
+                    else
+                    {
+                        var xelChild = xel.Elements().FirstOrDefault(x => x.Name.LocalName == childProp.ElementName);
+                        if (xelChild != null)
+                        {
+                            SetProperty(newIns, childProp.Property, xelChild);
+                        }
                     }
                 }
 
@@ -233,6 +283,32 @@ namespace Lotus.Serialization
                     property.XSetValue(instance, propertyValueResult.Value);
                 }
             }
+        }
+
+        private XElement CreateXElement(XElementAttribute elementAttribute, XElement parent)
+        {
+            var element = new XElement(elementAttribute.ElementName);
+
+            //如果当前节点自己有命名空间，则添加自己的命名空间
+            if (!String.IsNullOrWhiteSpace(elementAttribute.Namespace))
+            {
+                element.Name = XName.Get(element.Name.LocalName, elementAttribute.Namespace);
+            }
+            else
+            {
+                //如果当前节点自己没有命名空间，但是父节点有命名空间，
+                //则将使用父节点的命名作为自己的命名空间
+                if (parent != null)
+                {
+                    String parentNamespace = parent.Name.NamespaceName;
+                    if (!String.IsNullOrWhiteSpace(parentNamespace))
+                    {
+                        element.Name = XName.Get(element.Name.LocalName, parentNamespace);
+                    }
+                }
+            }
+
+            return element;
         }
 
         /// <summary>

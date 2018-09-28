@@ -13,6 +13,8 @@ namespace Lotus.CommonService.Controllers
     [ApiController]
     public class RSAController : ControllerBase
     {
+        private const String OpenSSLFilePath = @"D:\openssl\bin\openssl.exe";
+
         [HttpPost]
         public ActionResult GenKeyPairs()
         {
@@ -36,17 +38,17 @@ namespace Lotus.CommonService.Controllers
             String privateKeySavePath = Path.Combine(cacheDir, privateKeyPemFileName);
             try
             {
-                var p = Process.Start("openssl", $"genrsa -out {privateKeySavePath} 1024");
+                var p = Process.Start(OpenSSLFilePath, $"genrsa -out {privateKeySavePath} 1024");
                 p.WaitForExit();
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, privateKeySavePath + "|" + ex.Message);
+                return this.Failure(null, privateKeySavePath + "|" + ex.Message);
             }
 
             if (!System.IO.File.Exists(privateKeySavePath))
             {
-                return this.FormatJson(null, $"File '{privateKeySavePath}' not found.");
+                return this.Failure(null, $"File '{privateKeySavePath}' not found.");
             }
 
             String privateKey = null;
@@ -59,23 +61,23 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
 
             String publicKeySavePath = Path.Combine(cacheDir, publicKeyPemFileName);
             try
             {
-                var p = Process.Start("openssl", $"rsa -pubout -in {privateKeySavePath} -out {publicKeySavePath}");
+                var p = Process.Start(OpenSSLFilePath , $"rsa -pubout -in {privateKeySavePath} -out {publicKeySavePath}");
                 p.WaitForExit();
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
 
             if (!System.IO.File.Exists(publicKeySavePath))
             {
-                return this.FormatJson(null, $"File '{publicKeySavePath}' not found.");
+                return this.Failure(null, $"File '{publicKeySavePath}' not found.");
             }
 
             String publicKey = null;
@@ -88,7 +90,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
 
             try
@@ -96,7 +98,7 @@ namespace Lotus.CommonService.Controllers
                 System.IO.File.Delete(privateKeySavePath);
                 System.IO.File.Delete(publicKeySavePath);
 
-                return this.FormatJson(new
+                return this.Success(new
                 {
                     PrivateKey = privateKey,
                     PublicKey = publicKey
@@ -104,7 +106,7 @@ namespace Lotus.CommonService.Controllers
             }
             catch (Exception ex)
             {
-                return this.FormatJson(null, ex.Message);
+                return this.Failure(null, ex.Message);
             }
         }
     }

@@ -8,18 +8,6 @@ namespace Lotus.Payment.Bill99.Domain
     [XElement("indAuthContent")]
     public class IndAuthRequestContent
     {
-        ///// <summary>
-        ///// 商户Id
-        ///// </summary>
-        //[XElement("merchantId")]
-        //public String MerchantId { get; set; }
-
-        ///// <summary>
-        ///// 终端Id
-        ///// </summary>
-        //[XElement("terminalId")]
-        //public String TerminalId { get; set; }
-
         /// <summary>
         /// 客户Id
         /// </summary>
@@ -31,6 +19,18 @@ namespace Lotus.Payment.Bill99.Domain
         /// </summary>
         [XElement("externalRefNumber")]
         public String ExternalRefNumber { get; set; }
+
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        [XElement("cardHolderName")]
+        public String CardHolderName { get; set; }
+
+        /// <summary>
+        /// 身份证号
+        /// </summary>
+        [XElement("cardHolderId")]
+        public String CardHolderId { get; set; }
 
         /// <summary>
         /// 银行卡号

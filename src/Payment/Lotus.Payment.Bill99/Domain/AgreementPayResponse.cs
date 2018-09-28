@@ -9,5 +9,8 @@ namespace Lotus.Payment.Bill99.Domain
     {
         [XElement("ErrorMsgContent")]
         public ErrorMsgContent ErrorMsgContent { get; set; }
+
+        [XElement("TxnMsgContent")]
+        public TxnMsgResponseContent TxnMsgContent { get; set; }
     }
 }
