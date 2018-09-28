@@ -66,5 +66,13 @@ namespace Lotus.OssCore
         /// <param name="imageKeys">要删除的图片的key值</param>
         /// <returns>返回删除成功的图片的key值</returns>
         XResult<IEnumerable<String>> Delete(String bucketName, String[] imageKeys);
+
+        /// <summary>
+        /// 删除多张图片
+        /// </summary>
+        /// <param name="bucketName">要删除的图片所在的bucket的名称</param>
+        /// <param name="directoryPath">要删除的目录路径</param>
+        /// <returns>返回删除成功的图片的key值</returns>
+        XResult<IEnumerable<String>> Delete(String bucketName, String directoryPath);
     }
 }

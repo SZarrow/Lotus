@@ -41,6 +41,13 @@ namespace Lotus.OssCore
         /// <returns>返回删除成功的对象的集合。</returns>
         XResult<IEnumerable<String>> DeleteObjects(String bucketName, String[] objectKeys);
         /// <summary>
+        /// 删除指定bucket下的指定名称的对象集合。
+        /// </summary>
+        /// <param name="bucketName">要删除的对象所在的bucket的名称</param>
+        /// <param name="directoryPath">要删除的目录</param>
+        /// <returns>返回删除成功的对象的集合。</returns>
+        XResult<IEnumerable<String>> DeleteObjects(String bucketName, String directoryPath);
+        /// <summary>
         /// 上传一个对象到云端。
         /// </summary>
         /// <param name="obj">要上传的对象。</param>
