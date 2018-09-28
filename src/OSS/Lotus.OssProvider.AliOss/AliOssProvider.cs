@@ -166,6 +166,24 @@ namespace Lotus.OssProvider.AliOss
             }
         }
 
+        public XResult<IEnumerable<String>> DeleteObjects(String bucketName, String directoryPath)
+        {
+            var listObjectsResult = this.ListObjects(bucketName, directoryPath);
+            if (listObjectsResult.Success)
+            {
+                var existedObjects = listObjectsResult.Value;
+                if (existedObjects == null || existedObjects.Count() == 0)
+                {
+                    return new XResult<IEnumerable<String>>(null, new FileNotFoundException($"there is no files in \"{directoryPath}\""));
+                }
+
+                var objectKeys = existedObjects.Select(x => x.ObjectKey).ToArray();
+                return this.DeleteObjects(bucketName, objectKeys);
+            }
+
+            return new XResult<IEnumerable<String>>(null, listObjectsResult.Exceptions.ToArray());
+        }
+
         public XResult<XOssObject> GetObject(String bucketName, String objectKey, Object args = null)
         {
             if (String.IsNullOrWhiteSpace(bucketName))
