@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +20,11 @@ namespace TestWeb
             {
                 option.ConnectionString = "mongodb://127.0.0.1:27017";
                 option.DbName = "test";
+            });
+
+            services.AddHttpClient("xxx").AddHttpClientHandler(handler =>
+            {
+                handler.ClientCertificates.Add(new X509Certificate());
             });
 
             services.AddMvc();
