@@ -4,11 +4,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lotus.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using DotNetWheels.AutoDI;
 
 namespace TestWeb
 {
@@ -22,10 +24,25 @@ namespace TestWeb
                 option.DbName = "test";
             });
 
-            services.AddHttpClient("xxx").AddHttpClientHandler(handler =>
-            {
-                handler.ClientCertificates.Add(new X509Certificate());
-            });
+            //services.AddHttpClient("xxx").AddHttpClientHandler(handler =>
+            //{
+            //    handler.ClientCertificates.Add(new X509Certificate());
+            //});
+
+            //var x = new HttpX(null);
+            //x.PostJsonAsync<Object>("xxx", "xxx", content =>
+            //{
+            //    content.Headers.Add("xxx", "xxx");
+            //}).Wait();
+
+
+            //services.AddHttpClient("快钱Client").AddHttpClientHandler(handler =>
+            //{
+            //    handler.ClientCertificates.Add("块钱的证书");
+            //});
+
+            //services.AddScoped<HttpClient>();
+            //services.AddScoped<HttpX>();
 
             services.AddMvc();
         }

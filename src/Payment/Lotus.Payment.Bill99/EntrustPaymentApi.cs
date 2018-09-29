@@ -17,7 +17,7 @@ using Lotus.Serialization;
 namespace Lotus.Payment.Bill99
 {
     /// <summary>
-    /// 委托代付API
+    /// 委托代收API
     /// </summary>
     public class EntrustPaymentApi
     {
