@@ -178,6 +178,21 @@ namespace Lotus.OssProvider.AliOss
             return _ossProvider.DeleteObjects(bucketName, imageKeys);
         }
 
+        public XResult<IEnumerable<String>> Delete(String bucketName, String directoryPath)
+        {
+            if (String.IsNullOrWhiteSpace(bucketName))
+            {
+                return new XResult<IEnumerable<String>>(null, new ArgumentNullException(nameof(bucketName)));
+            }
+
+            if (String.IsNullOrWhiteSpace(directoryPath))
+            {
+                return new XResult<IEnumerable<String>>(null, new ArgumentNullException(nameof(directoryPath)));
+            }
+
+            return _ossProvider.DeleteObjects(bucketName, directoryPath);
+        }
+
         private String MergeImageProcessParameters(ImageProcessParameter[] parameters)
         {
             if (parameters == null || parameters.Length == 0)
@@ -187,6 +202,5 @@ namespace Lotus.OssProvider.AliOss
 
             return "image" + String.Concat(from p in parameters select p.GetProcessArguments());
         }
-
     }
 }
