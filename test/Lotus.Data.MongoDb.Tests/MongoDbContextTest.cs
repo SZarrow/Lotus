@@ -185,7 +185,7 @@ namespace Lotus.Data.MongoDb.Tests
         {
             List<Product> products = new List<Product>();
 
-            for (var i = 0; i < 1000000; i++)
+            for (var i = 0; i < 100000; i++)
             {
                 products.Add(new Product()
                 {
