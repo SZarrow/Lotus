@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetWheels.Core" Version="1.0.30" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Lotus.Core\Lotus.Core.csproj" />
   </ItemGroup>
 
