@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DotNetWheels.Core;
 using Lotus.Data.MongoDb;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -42,7 +41,14 @@ namespace Microsoft.Extensions.DependencyInjection
                     throw new NullReferenceException($"unable to reflect the constructor info of  type '{typeof(T).FullName}'");
                 }
 
-                return ctorInfo.XConstruct(new Object[] { option }) as T;
+                try
+                {
+                    return ctorInfo.Invoke(new Object[] { option }) as T;
+                }
+                catch (Exception)
+                {
+                    return default(T);
+                }
             });
 
             return services;

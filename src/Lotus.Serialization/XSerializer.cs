@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using DotNetWheels.Core;
+using Lotus.Core;
 
 namespace Lotus.Serialization
 {

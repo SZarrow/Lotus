@@ -89,7 +89,6 @@ namespace Lotus.Security
                 return new XResult<Byte[]>(null, new CryptographicException("CreateRSAFromPublicKey(publicKeyPem) returns null"));
             }
 
-            //这个地方不知道为啥要减掉11，不减的话会报错
             Int32 maxBlockSize = rsa.KeySize / 8 - 11;
 
             if (stream.Length <= maxBlockSize)

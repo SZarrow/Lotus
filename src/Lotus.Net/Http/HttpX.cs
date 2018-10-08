@@ -49,11 +49,16 @@ namespace Lotus.Net.Http
             }
         }
 
-        public async Task<XResult<TResult>> PostJsonAsync<TResult>(String postUrl, String jsonString)
+        public async Task<XResult<TResult>> PostJsonAsync<TResult>(String postUrl, String jsonString, Action<HttpContent> config = null)
         {
             HttpContent content = new StringContent(jsonString);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             content.Headers.ContentEncoding.Add("UTF-8");
+
+            if (config != null)
+            {
+                config(content);
+            }
 
             var respContent = await PostAsync(postUrl, content);
             if (!respContent.Success)
